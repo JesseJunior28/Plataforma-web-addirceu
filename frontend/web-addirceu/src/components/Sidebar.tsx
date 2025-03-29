@@ -9,7 +9,8 @@ import {
   FiSettings, 
   FiClipboard,
   FiChevronLeft,
-  FiChevronRight
+  FiChevronRight,
+  FiFileText
 } from 'react-icons/fi';
 import Image from 'next/image';
 
@@ -95,6 +96,14 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
               }`}>
                 <FiSettings className="text-xl" />
                 {!collapsed && <span className="ml-3">Configurações</span>}
+              </Link>
+            </li>
+            <li>
+              <Link href="/relatorios" className={`flex items-center p-3 hover:bg-blue-800 rounded-md transition-colors ${
+                collapsed ? 'justify-center' : ''
+              }`}>
+                <FiFileText className="text-xl" />
+                {!collapsed && <span className="ml-3">Relatórios</span>}
               </Link>
             </li>
           </ul>

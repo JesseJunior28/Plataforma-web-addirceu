@@ -104,9 +104,16 @@ export default function InscricoesPage() {
             }}
           >
             <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center backdrop-blur-xl bg-white/80">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
-                Inscrição - {congressoSelecionado.titulo}
-              </h2>
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/addirceu.png" 
+                  alt="Logo AD Dirceu" 
+                  className="w-10 h-10 object-contain rounded-full bg-white p-1"
+                />
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
+                  Inscrição - {congressoSelecionado.titulo}
+                </h2>
+              </div>
               <button 
                 onClick={fecharModal}
                 className="text-gray-500 hover:text-gray-700 transition-all duration-200 p-2 rounded-full hover:bg-gray-100"
@@ -117,437 +124,461 @@ export default function InscricoesPage() {
               </button>
             </div>
 
-            <div className="p-8">
+            <div className="p-8 bg-gradient-to-br from-blue-50 to-white">
               {/* Renderização condicional dos formulários por tipo de congresso */}
               {congressoSelecionado.id === 1 ? (
-                <form className="space-y-6">
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Nome completo <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      type="text" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Apelido
-                    </label>
-                    <input 
-                      type="text" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      CPF
-                    </label>
-                    <input 
-                      type="text" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Telefone do WhatsApp <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      type="tel" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Congregação <span className="text-red-500">*</span>
-                    </label>
-                    <select 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
-                      required
-                    >
-                      <option value="">Selecione...</option>
-                      {congregacoes.map((cong, index) => (
-                        <option key={index} value={cong}>{cong}</option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Cor da camisa <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex space-x-6">
-                      <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
-                        <input type="radio" name="cor_camisa" value="Preta" className="mr-2 h-4 w-4 text-blue-600" required />
-                        <span className="text-black">Preta</span>
+                <form className="space-y-8 relative">
+                  <div className="absolute inset-0 bg-blue-50/50 backdrop-blur-3xl -z-10 rounded-xl"></div>
+                  <div className="bg-white p-6 rounded-xl shadow-lg shadow-blue-100 space-y-6 border border-blue-100">
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Nome completo <span className="text-red-500">*</span>
                       </label>
-                      <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
-                        <input type="radio" name="cor_camisa" value="Lilás" className="mr-2 h-4 w-4 text-blue-600" />
-                        <span className="text-black">Lilás</span>
+                      <input 
+                        type="text" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Apelido
                       </label>
+                      <input 
+                        type="text" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                      />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Estilo <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex space-x-6">
-                      <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
-                        <input type="radio" name="estilo" value="Babylook" className="mr-2 h-4 w-4 text-blue-600" required />
-                        <span className="text-black">Babylook</span>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        CPF
                       </label>
-                      <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
-                        <input type="radio" name="estilo" value="Normal" className="mr-2 h-4 w-4 text-blue-600" />
-                        <span className="text-black">Normal</span>
+                      <input 
+                        type="text" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Telefone do WhatsApp <span className="text-red-500">*</span>
                       </label>
+                      <input 
+                        type="tel" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                        required
+                      />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Tamanho da camisa <span className="text-red-500">*</span>
-                    </label>
-                    <select 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
-                      required
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="PP">PP</option>
-                      <option value="P">P</option>
-                      <option value="M">M</option>
-                      <option value="G">G</option>
-                      <option value="GG">GG</option>
-                      <option value="EXG">EXG</option>
-                      <option value="Sob medida">Sob medida</option>
-                    </select>
-                  </div>
-                  
-                </form>
-              ) : congressoSelecionado.id === 2 ? (
-                <form className="space-y-6">
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Nome completo da criança <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      type="text" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Nome do responsável <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      type="text" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Apelido da criança
-                    </label>
-                    <input 
-                      type="text" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Telefone do WhatsApp do responsável <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      type="tel" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Congregação <span className="text-red-500">*</span>
-                    </label>
-                    <select 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
-                      required
-                    >
-                      <option value="">Selecione...</option>
-                      {congregacoes.map((cong, index) => (
-                        <option key={index} value={cong}>{cong}</option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Cor da camisa <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex items-center">
-                      <input type="radio" name="cor_camisa" value="Branca" className="mr-2 h-4 w-4 text-blue-600" checked required />
-                      <span className="text-black">Branca</span>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Congregação <span className="text-red-500">*</span>
+                      </label>
+                      <select 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                        required
+                      >
+                        <option value="">Selecione...</option>
+                        {congregacoes.map((cong, index) => (
+                          <option key={index} value={cong}>{cong}</option>
+                        ))}
+                      </select>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Estilo <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex items-center">
-                      <input type="radio" name="estilo" value="Normal" className="mr-2 h-4 w-4 text-blue-600" checked required />
-                      <span className="text-black">Normal</span>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Cor da camisa <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex space-x-6">
+                        <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
+                          <input type="radio" name="cor_camisa" value="Preta" className="mr-2 h-4 w-4 text-blue-600" required />
+                          <span className="text-black">Preta</span>
+                        </label>
+                        <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
+                          <input type="radio" name="cor_camisa" value="Lilás" className="mr-2 h-4 w-4 text-blue-600" />
+                          <span className="text-black">Lilás</span>
+                        </label>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Tamanho da camisa <span className="text-red-500">*</span>
-                    </label>
-                    <select 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
-                      required
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="2">2</option>
-                      <option value="4">4</option>
-                      <option value="6">6</option>
-                      <option value="8">8</option>
-                      <option value="10">10</option>
-                      <option value="12">12</option>
-                      <option value="14">14</option>
-                      <option value="P">P</option>
-                      <option value="M">M</option>
-                      <option value="G">G</option>
-                      <option value="GG">GG</option>
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Forma de pagamento
-                    </label>
-                    <select 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="Espécie">Espécie</option>
-                      <option value="Pix">Pix</option>
-                      <option value="Cartão">Cartão</option>
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Valor pago
-                    </label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Camisa entregue
-                    </label>
-                    <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
-                      <input type="checkbox" className="mr-2 h-4 w-4 text-blue-600 rounded" />
-                      <span className="text-black">Sim, a camisa foi entregue</span>
-                    </label>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Observação
-                    </label>
-                    <textarea 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                      rows={3}
-                    ></textarea>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Estilo <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex space-x-6">
+                        <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
+                          <input type="radio" name="estilo" value="Babylook" className="mr-2 h-4 w-4 text-blue-600" required />
+                          <span className="text-black">Babylook</span>
+                        </label>
+                        <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
+                          <input type="radio" name="estilo" value="Normal" className="mr-2 h-4 w-4 text-blue-600" />
+                          <span className="text-black">Normal</span>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Tamanho da camisa <span className="text-red-500">*</span>
+                      </label>
+                      <select 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                        required
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="PP">PP</option>
+                        <option value="P">P</option>
+                        <option value="M">M</option>
+                        <option value="G">G</option>
+                        <option value="GG">GG</option>
+                        <option value="EXG">EXG</option>
+                        <option value="Sob medida">Sob medida</option>
+                      </select>
+                    </div>
                   </div>
                   
                   <div className="pt-6 flex justify-end space-x-4">
                     <button 
                       type="button"
                       onClick={fecharModal}
-                      className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium"
+                      className="px-6 py-3 border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-50 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
                     >
                       Cancelar
                     </button>
                     <button 
                       type="submit"
-                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-lg shadow-blue-500/30"
+                      className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-medium shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transform hover:-translate-y-0.5"
+                    >
+                      Confirmar Inscrição
+                    </button>
+                  </div>
+                </form>
+              ) : congressoSelecionado.id === 2 ? (
+                <form className="space-y-8 relative">
+                  <div className="absolute inset-0 bg-blue-50/50 backdrop-blur-3xl -z-10 rounded-xl"></div>
+                  <div className="bg-white p-6 rounded-xl shadow-lg shadow-blue-100 space-y-6 border border-blue-100">
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Nome completo da criança <span className="text-red-500">*</span>
+                      </label>
+                      <input 
+                        type="text" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Nome do responsável <span className="text-red-500">*</span>
+                      </label>
+                      <input 
+                        type="text" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Apelido da criança
+                      </label>
+                      <input 
+                        type="text" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Telefone do WhatsApp do responsável <span className="text-red-500">*</span>
+                      </label>
+                      <input 
+                        type="tel" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Congregação <span className="text-red-500">*</span>
+                      </label>
+                      <select 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                        required
+                      >
+                        <option value="">Selecione...</option>
+                        {congregacoes.map((cong, index) => (
+                          <option key={index} value={cong}>{cong}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Cor da camisa <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex items-center">
+                        <input type="radio" name="cor_camisa" value="Branca" className="mr-2 h-4 w-4 text-blue-600" checked required />
+                        <span className="text-black">Branca</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Estilo <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex items-center">
+                        <input type="radio" name="estilo" value="Normal" className="mr-2 h-4 w-4 text-blue-600" checked required />
+                        <span className="text-black">Normal</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Tamanho da camisa <span className="text-red-500">*</span>
+                      </label>
+                      <select 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                        required
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="2">2</option>
+                        <option value="4">4</option>
+                        <option value="6">6</option>
+                        <option value="8">8</option>
+                        <option value="10">10</option>
+                        <option value="12">12</option>
+                        <option value="14">14</option>
+                        <option value="P">P</option>
+                        <option value="M">M</option>
+                        <option value="G">G</option>
+                        <option value="GG">GG</option>
+                      </select>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Forma de pagamento
+                      </label>
+                      <select 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="Espécie">Espécie</option>
+                        <option value="Pix">Pix</option>
+                        <option value="Cartão">Cartão</option>
+                      </select>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Valor pago
+                      </label>
+                      <input 
+                        type="number" 
+                        step="0.01"
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Camisa entregue
+                      </label>
+                      <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
+                        <input type="checkbox" className="mr-2 h-4 w-4 text-blue-600 rounded" />
+                        <span className="text-black">Sim, a camisa foi entregue</span>
+                      </label>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Observação
+                      </label>
+                      <textarea 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                        rows={3}
+                      ></textarea>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-6 flex justify-end space-x-4">
+                    <button 
+                      type="button"
+                      onClick={fecharModal}
+                      className="px-6 py-3 border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-50 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                    >
+                      Cancelar
+                    </button>
+                    <button 
+                      type="submit"
+                      className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-medium shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transform hover:-translate-y-0.5"
                     >
                       Confirmar Inscrição
                     </button>
                   </div>
                 </form>
               ) : congressoSelecionado.id === 3 ? (
-                <form className="space-y-6">
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Nome completo <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      type="text" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Apelido
-                    </label>
-                    <input 
-                      type="text" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      CPF
-                    </label>
-                    <input 
-                      type="text" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Telefone do WhatsApp <span className="text-red-500">*</span>
-                    </label>
-                    <input 
-                      type="tel" 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Congregação <span className="text-red-500">*</span>
-                    </label>
-                    <select 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
-                      required
-                    >
-                      <option value="">Selecione...</option>
-                      {congregacoes.map((cong, index) => (
-                        <option key={index} value={cong}>{cong}</option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Cor da camisa <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex items-center">
-                      <input type="radio" name="cor_camisa" value="Vinho" className="mr-2 h-4 w-4 text-blue-600" checked required />
-                      <span className="text-black">Vinho</span>
+                <form className="space-y-8 relative">
+                  <div className="absolute inset-0 bg-blue-50/50 backdrop-blur-3xl -z-10 rounded-xl"></div>
+                  <div className="bg-white p-6 rounded-xl shadow-lg shadow-blue-100 space-y-6 border border-blue-100">
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Nome completo <span className="text-red-500">*</span>
+                      </label>
+                      <input 
+                        type="text" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                        required
+                      />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Estilo <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex items-center">
-                      <input type="radio" name="estilo" value="Normal" className="mr-2 h-4 w-4 text-blue-600" checked required />
-                      <span className="text-black">Normal</span>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Apelido
+                      </label>
+                      <input 
+                        type="text" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                      />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Tamanho da camisa <span className="text-red-500">*</span>
-                    </label>
-                    <select 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
-                      required
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="PP">PP</option>
-                      <option value="P">P</option>
-                      <option value="M">M</option>
-                      <option value="G">G</option>
-                      <option value="GG">GG</option>
-                      <option value="EXG">EXG</option>
-                      <option value="Sob medida">Sob medida</option>
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Forma de pagamento
-                    </label>
-                    <select 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="Espécie">Espécie</option>
-                      <option value="Pix">Pix</option>
-                      <option value="Cartão">Cartão</option>
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Valor pago
-                    </label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Camisa entregue
-                    </label>
-                    <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
-                      <input type="checkbox" className="mr-2 h-4 w-4 text-blue-600 rounded" />
-                      <span className="text-black">Sim, a camisa foi entregue</span>
-                    </label>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Observação
-                    </label>
-                    <textarea 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
-                      rows={3}
-                    ></textarea>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        CPF
+                      </label>
+                      <input 
+                        type="text" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Telefone do WhatsApp <span className="text-red-500">*</span>
+                      </label>
+                      <input 
+                        type="tel" 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Congregação <span className="text-red-500">*</span>
+                      </label>
+                      <select 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                        required
+                      >
+                        <option value="">Selecione...</option>
+                        {congregacoes.map((cong, index) => (
+                          <option key={index} value={cong}>{cong}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Cor da camisa <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex items-center">
+                        <input type="radio" name="cor_camisa" value="Vinho" className="mr-2 h-4 w-4 text-blue-600" checked required />
+                        <span className="text-black">Vinho</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Estilo <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex items-center">
+                        <input type="radio" name="estilo" value="Normal" className="mr-2 h-4 w-4 text-blue-600" checked required />
+                        <span className="text-black">Normal</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Tamanho da camisa <span className="text-red-500">*</span>
+                      </label>
+                      <select 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                        required
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="PP">PP</option>
+                        <option value="P">P</option>
+                        <option value="M">M</option>
+                        <option value="G">G</option>
+                        <option value="GG">GG</option>
+                        <option value="EXG">EXG</option>
+                        <option value="Sob medida">Sob medida</option>
+                      </select>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Forma de pagamento
+                      </label>
+                      <select 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="Espécie">Espécie</option>
+                        <option value="Pix">Pix</option>
+                        <option value="Cartão">Cartão</option>
+                      </select>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Valor pago
+                      </label>
+                      <input 
+                        type="number" 
+                        step="0.01"
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Camisa entregue
+                      </label>
+                      <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
+                        <input type="checkbox" className="mr-2 h-4 w-4 text-blue-600 rounded" />
+                        <span className="text-black">Sim, a camisa foi entregue</span>
+                      </label>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                        Observação
+                      </label>
+                      <textarea 
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                        rows={3}
+                      ></textarea>
+                    </div>
                   </div>
                   
                   <div className="pt-6 flex justify-end space-x-4">
                     <button 
                       type="button"
                       onClick={fecharModal}
-                      className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium"
+                      className="px-6 py-3 border border-blue-200 rounded-lg text-blue-700 hover:bg-blue-50 transition-all duration-200 font-medium shadow-sm hover:shadow-md"
                     >
                       Cancelar
                     </button>
                     <button 
                       type="submit"
-                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-lg shadow-blue-500/30"
+                      className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-medium shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transform hover:-translate-y-0.5"
                     >
                       Confirmar Inscrição
                     </button>
