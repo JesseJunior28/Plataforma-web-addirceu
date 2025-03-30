@@ -46,18 +46,23 @@ class CongregacaoEvento(models.Model):
     def __str__(self):
         return f"{self.congregacao} - {self.evento}" 
 
-class Camisa (models.Model):
+class Camisa(models.Model):
+    ESTILO_CHOICES = [
+        ('normal', 'Normal'),
+        ('babylook', 'Babylook'),
+    ]
+
     cor = models.CharField(max_length=50)
-    estilo = models.BooleanField()
-    flg_p = models.BooleanField()
-    flg_m = models.BooleanField()
-    flg_g = models.BooleanField()
-    flg_gg = models.BooleanField()
-    flg_exg = models.BooleanField()
-    flg_sobmedida = models.BooleanField()
+    estilo = models.CharField(max_length=10, choices=ESTILO_CHOICES)
+    flg_p = models.BooleanField(verbose_name= "P")
+    flg_m = models.BooleanField(verbose_name= "M")
+    flg_g = models.BooleanField(verbose_name= "G")
+    flg_gg = models.BooleanField(verbose_name= "GG")
+    flg_exg = models.BooleanField(verbose_name= "EXG")
+    flg_sobmedida = models.BooleanField(verbose_name= "Sob-Medida")
 
     def __str__(self):
-        return f"Camisa {self.cor}"
+        return f"Camisa {self.cor} - {self.get_estilo_display()}"
 
 class Remessa(models.Model):
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
@@ -87,10 +92,8 @@ class Inscricao(models.Model):
     
     data = models.DateField()
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     tipo_no_evento = models.CharField(max_length=50, choices=TIPO_NO_EVENTO_CHOICES)
     camisa = models.ForeignKey(Camisa, on_delete=models.CASCADE)
-    remessa = models.ForeignKey(Remessa, on_delete=models.SET_NULL, null= True, blank=True)
     data_entrega_camisa = models.DateField(null=True, blank=True)
     TAMANHO_CHOICES = [
         ('P', 'P'),
@@ -114,5 +117,9 @@ class Inscricao(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 
-    def __str__ (self):
-        return f"{self.usuario} - {self.evento}"
+    def __str__(self):
+        return f"Inscrição para {self.evento} - {self.tamanho}"
+
+    
+    def valor_pago_formatado(self):
+        return f"R$ {self.valor_pago:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")

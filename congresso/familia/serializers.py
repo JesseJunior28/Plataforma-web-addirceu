@@ -50,3 +50,19 @@ class InscricaoSerializer(serializers.ModelSerializer):
         fields = ['id', 'data', 'usuario', 'usuario_nome', 'evento', 'evento_nome',
                  'tipo_no_evento', 'camisa', 'camisa_cor', 'tamanho', 'forma_pagamento',
                  'valor_pago', 'pagamento', 'camisa_entregue', 'observacao']
+        
+class RemessaSerializer(serializers.ModelSerializer):
+    evento_nome = serializers.ReadOnlyField(source='evento.nome')
+
+    class Meta:
+        model = Remessa
+        fields = ['id', 'evento', 'evento_nome', 'data_pedido', 'status' ]
+
+class CongregacaoEventoSerializer(serializers.ModelSerializer):
+    congregacao_nome = serializers.ReadOnlyField(source='congregacao.nome')
+    evento_nome = serializers.ReadOnlyField(source='evento.nome')
+    concentrador_nome = serializers.ReadOnlyField(source='concentrador.nome')
+
+    class Meta:
+        model = CongregacaoEvento
+        Fields = ['id', 'congrecacao', 'congrecacao_nome', 'evento', 'evento_nome', 'concentrador', 'concentrador_nome']
