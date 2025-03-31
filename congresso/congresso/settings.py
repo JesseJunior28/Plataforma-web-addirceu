@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'familia.apps.FamiliaConfig',
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
+
 ]
 
 MIDDLEWARE = [

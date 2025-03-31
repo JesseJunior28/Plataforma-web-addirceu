@@ -90,9 +90,19 @@ class Inscricao(models.Model):
         (TIPO_ADMIN_EVENTO, 'Administrador de Evento'),
     ]
     
+    # Campos básicos da inscrição
     data = models.DateField()
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
     tipo_no_evento = models.CharField(max_length=50, choices=TIPO_NO_EVENTO_CHOICES)
+    
+    # Dados do participante diretamente na inscrição
+    nome_completo = models.CharField(max_length=255, default="Participante")
+    apelido = models.CharField(max_length=255, blank=True, null=True)  # Campo apelido está presente
+    cpf = models.CharField(max_length=14, blank=True, null=True)
+    whatsapp = models.CharField(max_length=20, blank=True, null=True)
+    congregacao = models.ForeignKey(Congregacao, on_delete=models.PROTECT, null=True)
+    
+    # Dados da camisa
     camisa = models.ForeignKey(Camisa, on_delete=models.CASCADE)
     data_entrega_camisa = models.DateField(null=True, blank=True)
     TAMANHO_CHOICES = [
@@ -104,7 +114,10 @@ class Inscricao(models.Model):
         ('SOB MEDIDA', 'Sob Medida'),
     ]
     tamanho = models.CharField(max_length=10, choices=TAMANHO_CHOICES)
-    pagamento = models.BooleanField(default=False)
+    camisa_entregue = models.BooleanField(default=False, verbose_name="Camisa foi entregue?")
+    
+    # Dados do pagamento
+    pagamento_feito = models.BooleanField(default=False, verbose_name="Pagamento feito?")
     FORMA_PAGAMENTO_CHOICES = [
         ('especie', 'Espécie'),
         ('pix', 'PIX'),
@@ -112,14 +125,12 @@ class Inscricao(models.Model):
     ]
     forma_pagamento = models.CharField(max_length=10, choices=FORMA_PAGAMENTO_CHOICES, default='especie', null=True, blank=True)
     valor_pago = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    camisa_entregue = models.BooleanField(default=False)
     observacao = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Inscrição para {self.evento} - {self.tamanho}"
+        return f"Inscrição de {self.nome_completo} para {self.evento}"
 
-    
     def valor_pago_formatado(self):
         return f"R$ {self.valor_pago:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")

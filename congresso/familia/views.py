@@ -1,71 +1,223 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, schema
 from django.shortcuts import get_object_or_404
 from .models import Usuario, Congregacao, Evento, Inscricao, Camisa
 from .serializers import (CongregacaoSerializer, EventoSerializer, 
                         CamisaSerializer, UsuarioSerializer, InscricaoSerializer)
 from django.db import transaction
 from django.utils import timezone
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from django.core.exceptions import ValidationError
 
 # Create your views here.
 
+@swagger_auto_schema(
+    method='post',
+    operation_description="Cadastra um novo participante",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['evento_id', 'camisa_id', 'tamanho', 'nome_completo', 'congregacao_id'],
+        properties={
+            'evento_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='ID do evento'),
+            'camisa_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='ID da camisa'),
+            'nome_completo': openapi.Schema(type=openapi.TYPE_STRING, description='Nome completo do participante'),
+            'apelido': openapi.Schema(type=openapi.TYPE_STRING, description='Apelido do participante'),
+            'cpf': openapi.Schema(type=openapi.TYPE_STRING, description='CPF do participante'),
+            'whatsapp': openapi.Schema(type=openapi.TYPE_STRING, description='Número de WhatsApp'),
+            'congregacao_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='ID da congregação'),
+            'tamanho': openapi.Schema(type=openapi.TYPE_STRING, description='Tamanho da camisa (P, M, G, GG, EXG, SOB MEDIDA)'),
+            'camisa_entregue': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Se a camisa foi entregue'),
+            'forma_pagamento': openapi.Schema(type=openapi.TYPE_STRING, description='Forma de pagamento (especie, pix, cartao)'),
+            'pagamento_feito': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Se o pagamento foi realizado'),
+            'valor_pago': openapi.Schema(type=openapi.TYPE_NUMBER, description='Valor pago'),
+            'observacao': openapi.Schema(type=openapi.TYPE_STRING, description='Observação'),
+        }
+    ),
+    responses={
+        201: openapi.Response(
+            description="Inscrição criada com sucesso",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING),
+                    'inscricao_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                }
+            )
+        ),
+        400: "Erro na requisição"
+    }
+)
 @api_view(['POST'])
 def cadastrar_participante(request):
+    """
+    Cadastra um novo participante
+    """
     try:
+        print("Dados recebidos:", request.data)
+        
         with transaction.atomic():
-            # Verificar se o usuário já existe
-            cpf = request.data.get('cpf')
-            telefone = request.data.get('telefone_whatsapp')
+            # Criar inscrição diretamente
+            inscricao = Inscricao()
             
-            usuario_existente = None
-            if cpf:
-                usuario_existente = Usuario.objects.filter(cpf=cpf).first()
+            # Campos obrigatórios
+            inscricao.evento = get_object_or_404(Evento, id=request.data.get('evento_id'))
+            inscricao.camisa = get_object_or_404(Camisa, id=request.data.get('camisa_id'))
+            inscricao.congregacao = get_object_or_404(Congregacao, id=request.data.get('congregacao_id'))
+            inscricao.tamanho = request.data.get('tamanho', 'G')
+            inscricao.data = timezone.now().date()
+            inscricao.tipo_no_evento = request.data.get('tipo_no_evento', 'participante')
             
-            if not usuario_existente and telefone:
-                usuario_existente = Usuario.objects.filter(telefone_whatsapp=telefone).first()
+            # Dados do participante
+            inscricao.nome_completo = request.data.get('nome_completo', 'Participante')
+            inscricao.apelido = request.data.get('apelido', '')  # Campo apelido está sendo processado
+            inscricao.cpf = request.data.get('cpf', '')
+            inscricao.whatsapp = request.data.get('whatsapp', '')
             
-            # Dados do usuário
-            usuario_data = {
-                'nome': request.data['nome_completo'],
-                'apelido': request.data.get('apelido', ''),
-                'cpf': cpf,
-                'telefone_whatsapp': telefone,
-                'congregacao': get_object_or_404(Congregacao, id=request.data['congregacao_id']),
-                'observacao': request.data.get('observacao', '')
-            }
+            # Dados da camisa e pagamento
+            inscricao.camisa_entregue = request.data.get('camisa_entregue', False)
+            inscricao.forma_pagamento = request.data.get('forma_pagamento', 'especie')
+            inscricao.pagamento_feito = request.data.get('pagamento_feito', False)
+            inscricao.valor_pago = request.data.get('valor_pago', 0)
+            inscricao.observacao = request.data.get('observacao', '')
             
-            # Criar novo usuário ou atualizar existente
-            if usuario_existente:
-                for key, value in usuario_data.items():
-                    if value:  # Apenas atualiza campos não vazios
-                        setattr(usuario_existente, key, value)
-                usuario_existente.save()
-                usuario = usuario_existente
-            else:
-                usuario = Usuario.objects.create(**usuario_data)
-            
-            # Criar inscrição
-            inscricao_data = {
-                'usuario': usuario,
-                'evento': get_object_or_404(Evento, id=request.data['evento_id']),
-                'camisa': get_object_or_404(Camisa, id=request.data['camisa_id']),
-                'tamanho': request.data['tamanho'],
-                'forma_pagamento': request.data.get('forma_pagamento', 'especie'),
-                'valor_pago': request.data.get('valor_pago', 0),
-                'camisa_entregue': request.data.get('camisa_entregue', False),
-                'observacao': request.data.get('observacao', ''),
-                'tipo_no_evento': 'participante',
-                'data': timezone.now().date(),
-            }
-            
-            inscricao = Inscricao.objects.create(**inscricao_data)
+            inscricao.save()
             
             return Response({
-                'message': 'Participante cadastrado com sucesso!',
-                'usuario_id': usuario.id,
+                'message': 'Inscrição realizada com sucesso!',
                 'inscricao_id': inscricao.id
+            }, status=status.HTTP_201_CREATED)
+            
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    method='post',
+    operation_description="Cadastra um novo evento",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['nome', 'data_inicio', 'data_fim'],
+        properties={
+            'nome': openapi.Schema(type=openapi.TYPE_STRING, description='Nome do evento'),
+            'data_inicio': openapi.Schema(type=openapi.TYPE_STRING, format='date', description='Data de início (formato: YYYY-MM-DD)'),
+            'data_fim': openapi.Schema(type=openapi.TYPE_STRING, format='date', description='Data de fim (formato: YYYY-MM-DD)'),
+        }
+    ),
+    responses={
+        201: openapi.Response(
+            description="Evento criado com sucesso",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING),
+                    'evento_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                }
+            )
+        ),
+        400: "Erro na requisição"
+    }
+)
+@api_view(['POST'])
+def cadastrar_evento(request):
+    """
+    Cadastra um novo evento
+    """
+    try:
+        with transaction.atomic():
+            # Obter dados do evento
+            nome = request.data.get('nome')
+            data_inicio = request.data.get('data_inicio')
+            data_fim = request.data.get('data_fim')
+            
+            # Validar dados
+            if not nome or not data_inicio or not data_fim:
+                return Response({
+                    'error': 'Os campos nome, data_inicio e data_fim são obrigatórios'
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+            # Criar evento
+            evento = Evento(
+                nome=nome,
+                data_inicio=data_inicio,
+                data_fim=data_fim
+            )
+            
+            # Validar datas
+            try:
+                evento.clean()
+            except ValidationError as e:
+                return Response({
+                    'error': str(e)
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+            evento.save()
+            
+            return Response({
+                'message': 'Evento cadastrado com sucesso!',
+                'evento_id': evento.id
+            }, status=status.HTTP_201_CREATED)
+            
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    method='post',
+    operation_description="Cadastra uma nova congregação",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['nome'],
+        properties={
+            'nome': openapi.Schema(type=openapi.TYPE_STRING, description='Nome da congregação'),
+        }
+    ),
+    responses={
+        201: openapi.Response(
+            description="Congregação criada com sucesso",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING),
+                    'congregacao_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                }
+            )
+        ),
+        400: "Erro na requisição"
+    }
+)
+@api_view(['POST'])
+def cadastrar_congregacao(request):
+    """
+    Cadastra uma nova congregação
+    """
+    try:
+        with transaction.atomic():
+            # Obter dados da congregação
+            nome = request.data.get('nome')
+            
+            # Validar dados
+            if not nome:
+                return Response({
+                    'error': 'O campo nome é obrigatório'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Verificar se já existe uma congregação com o mesmo nome
+            if Congregacao.objects.filter(nome=nome).exists():
+                return Response({
+                    'error': 'Já existe uma congregação com este nome'
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+            # Criar congregação
+            congregacao = Congregacao.objects.create(nome=nome)
+            
+            return Response({
+                'message': 'Congregação cadastrada com sucesso!',
+                'congregacao_id': congregacao.id
             }, status=status.HTTP_201_CREATED)
             
     except Exception as e:
@@ -116,6 +268,218 @@ def listar_camisas(request):
             'error': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(
+    method='put',
+    operation_description="Edita uma inscrição existente",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'evento_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+            'camisa_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+            'congregacao_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+            'tamanho': openapi.Schema(type=openapi.TYPE_STRING),
+            'nome_completo': openapi.Schema(type=openapi.TYPE_STRING),
+            'apelido': openapi.Schema(type=openapi.TYPE_STRING),
+            'whatsapp': openapi.Schema(type=openapi.TYPE_STRING),
+            'cpf': openapi.Schema(type=openapi.TYPE_STRING),
+            'forma_pagamento': openapi.Schema(type=openapi.TYPE_STRING),
+            'pagamento_feito': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+            'valor_pago': openapi.Schema(type=openapi.TYPE_NUMBER),
+            'camisa_entregue': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+            'observacao': openapi.Schema(type=openapi.TYPE_STRING),
+            'tipo_no_evento': openapi.Schema(type=openapi.TYPE_STRING),
+        }
+    ),
+    responses={
+        200: "Inscrição atualizada com sucesso",
+        400: "Erro na requisição",
+        404: "Inscrição não encontrada"
+    }
+)
+@api_view(['PUT'])
+def editar_inscricao(request, inscricao_id):
+    """
+    Edita uma inscrição existente
+    """
+    try:
+        with transaction.atomic():
+            # Buscar inscrição existente
+            inscricao = get_object_or_404(Inscricao, id=inscricao_id)
+            
+            # Atualizar dados da inscrição
+            if 'evento_id' in request.data:
+                inscricao.evento = get_object_or_404(Evento, id=request.data['evento_id'])
+            
+            if 'camisa_id' in request.data:
+                inscricao.camisa = get_object_or_404(Camisa, id=request.data['camisa_id'])
+            
+            if 'congregacao_id' in request.data:
+                inscricao.congregacao = get_object_or_404(Congregacao, id=request.data['congregacao_id'])
+            
+            if 'tamanho' in request.data:
+                inscricao.tamanho = request.data['tamanho']
+            
+            if 'forma_pagamento' in request.data:
+                inscricao.forma_pagamento = request.data['forma_pagamento']
+            
+            if 'valor_pago' in request.data:
+                inscricao.valor_pago = request.data['valor_pago']
+            
+            if 'camisa_entregue' in request.data:
+                inscricao.camisa_entregue = request.data['camisa_entregue']
+                
+            if 'pagamento_feito' in request.data:
+                inscricao.pagamento_feito = request.data['pagamento_feito']
+            
+            if 'observacao' in request.data:
+                inscricao.observacao = request.data['observacao']
+            
+            if 'tipo_no_evento' in request.data:
+                inscricao.tipo_no_evento = request.data['tipo_no_evento']
+                
+            # Atualizar dados do participante
+            if 'nome_completo' in request.data:
+                inscricao.nome_completo = request.data['nome_completo']
+                
+            if 'apelido' in request.data:
+                inscricao.apelido = request.data['apelido']
+                
+            if 'whatsapp' in request.data:
+                inscricao.whatsapp = request.data['whatsapp']
+                
+            if 'cpf' in request.data:
+                inscricao.cpf = request.data['cpf']
+            
+            inscricao.save()
+            
+            return Response({
+                'message': 'Inscrição atualizada com sucesso!',
+                'inscricao_id': inscricao.id
+            }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    method='delete',
+    operation_description="Exclui uma inscrição existente",
+    responses={
+        200: "Inscrição excluída com sucesso",
+        400: "Erro na requisição",
+        404: "Inscrição não encontrada"
+    }
+)
+@api_view(['DELETE'])
+def deletar_inscricao(request, inscricao_id):
+    """
+    Exclui uma inscrição existente
+    """
+    try:
+        inscricao = get_object_or_404(Inscricao, id=inscricao_id)
+        inscricao.delete()
+        
+        return Response({
+            'message': 'Inscrição excluída com sucesso!',
+            'inscricao_id': inscricao_id
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    method='delete',
+    operation_description="Exclui uma congregação existente",
+    responses={
+        200: "Congregação excluída com sucesso",
+        400: "Erro na requisição",
+        404: "Congregação não encontrada"
+    }
+)
+@api_view(['DELETE'])
+def deletar_congregacao(request, congregacao_id):
+    """
+    Exclui uma congregação existente
+    """
+    try:
+        # Verificar se existem inscrições associadas a esta congregação
+        if Inscricao.objects.filter(congregacao_id=congregacao_id).exists():
+            return Response({
+                'error': 'Não é possível excluir esta congregação pois existem inscrições associadas a ela'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Verificar se existem usuários associados a esta congregação
+        if Usuario.objects.filter(congregacao_id=congregacao_id).exists():
+            return Response({
+                'error': 'Não é possível excluir esta congregação pois existem usuários associados a ela'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verificar se a congregação existe
+        congregacao = get_object_or_404(Congregacao, id=congregacao_id)
+        
+        # Excluir a congregação
+        nome = congregacao.nome
+        congregacao.delete()
+        
+        return Response({
+            'message': f'Congregação "{nome}" excluída com sucesso!',
+            'congregacao_id': congregacao_id
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    method='delete',
+    operation_description="Exclui um evento existente",
+    responses={
+        200: "Evento excluído com sucesso",
+        400: "Erro na requisição",
+        404: "Evento não encontrado"
+    }
+)
+@api_view(['DELETE'])
+def deletar_evento(request, evento_id):
+    """
+    Exclui um evento existente
+    """
+    try:
+        # Verificar se existem inscrições associadas a este evento
+        if Inscricao.objects.filter(evento_id=evento_id).exists():
+            return Response({
+                'error': 'Não é possível excluir este evento pois existem inscrições associadas a ele'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Verificar se existem remessas associadas a este evento
+        if Remessa.objects.filter(evento_id=evento_id).exists():
+            return Response({
+                'error': 'Não é possível excluir este evento pois existem remessas associadas a ele'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Verificar se existem relações congregação-evento associadas
+        if CongregacaoEvento.objects.filter(evento_id=evento_id).exists():
+            return Response({
+                'error': 'Não é possível excluir este evento pois existem relações com congregações'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        evento = get_object_or_404(Evento, id=evento_id)
+        evento.delete()
+        
+        return Response({
+            'message': 'Evento excluído com sucesso!',
+            'evento_id': evento_id
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['GET'])
 def api_root(request):
     """
@@ -123,15 +487,68 @@ def api_root(request):
     """
     host = request.get_host()
     scheme = request.scheme
+    
+    # Corrigir a construção da URL base
     base_url = f"{scheme}://{host}"
+    
+    # Certifique-se de que base_url não termina com barra
+    if base_url.endswith('/'):
+        base_url = base_url[:-1]
     
     return Response({
         'endpoints': {
-            'congregacoes': f"{base_url}/api/congregacoes/",
-            'eventos': f"{base_url}/api/eventos/",
+            'congregacoes': {
+                'listar': f"{base_url}/api/congregacoes/",
+                'cadastrar': f"{base_url}/api/congregacao/cadastro/",
+                'deletar': f"{base_url}/api/congregacao/deletar/<congregacao_id>/"
+            },
+            'eventos': {
+                'listar': f"{base_url}/api/eventos/",
+                'cadastrar': f"{base_url}/api/evento/cadastro/",
+                'deletar': f"{base_url}/api/evento/deletar/<evento_id>/"
+            },
             'camisas': f"{base_url}/api/camisas/",
-            'cadastro_participante': f"{base_url}/api/participante/cadastro/",
+            'inscricoes': f"{base_url}/api/inscricoes/",
+            'cadastro_participante': {
+                'url': f"{base_url}/api/participante/cadastro/",
+                'metodo': 'POST',
+                'campos_obrigatorios': ['evento_id', 'camisa_id', 'tamanho', 'nome_completo', 'congregacao_id'],
+                'campos_opcionais': ['apelido', 'cpf', 'whatsapp', 'forma_pagamento', 'pagamento_feito', 'valor_pago', 'camisa_entregue', 'observacao'],
+                'exemplo': {
+                    'evento_id': 1,
+                    'camisa_id': 2,
+                    'congregacao_id': 1,
+                    'tamanho': 'G',
+                    'nome_completo': 'Nome do Participante',
+                    'apelido': 'Apelido',
+                    'cpf': '123.456.789-00',
+                    'whatsapp': '83999999999',
+                    'camisa_entregue': False,
+                    'forma_pagamento': 'especie',
+                    'pagamento_feito': True,
+                    'valor_pago': 30.00
+                }
+            },
+            'editar_inscricao': f"{base_url}/api/inscricao/editar/<inscricao_id>/",
+            'deletar_inscricao': f"{base_url}/api/inscricao/deletar/<inscricao_id>/",
         },
         'documentacao': 'Para mais informações, consulte o README do projeto',
         'devs': ['Ytallo Gomes', 'Jesse', 'Ramielke']
     })
+
+@api_view(['GET'])
+def listar_inscricoes(request):
+    """
+    Lista todas as inscrições
+    """
+    try:
+        inscricoes = Inscricao.objects.all().order_by('-data')
+        serializer = InscricaoSerializer(inscricoes, many=True)
+        return Response({
+            'inscricoes': serializer.data,
+            'instrucoes': 'Para editar uma inscrição específica, use a URL /api/inscricao/editar/{id}/'
+        })
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)

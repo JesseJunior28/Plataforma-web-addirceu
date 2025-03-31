@@ -41,16 +41,19 @@ class UsuarioSerializer(serializers.ModelSerializer):
                  'telefone_whatsapp', 'cpf', 'observacao']
 
 class InscricaoSerializer(serializers.ModelSerializer):
-    usuario_nome = serializers.ReadOnlyField(source='usuario.nome')
     evento_nome = serializers.ReadOnlyField(source='evento.nome')
     camisa_cor = serializers.ReadOnlyField(source='camisa.cor')
+    camisa_estilo = serializers.ReadOnlyField(source='camisa.get_estilo_display')
+    congregacao_nome = serializers.ReadOnlyField(source='congregacao.nome')
     
     class Meta:
         model = Inscricao
-        fields = ['id', 'data', 'usuario', 'usuario_nome', 'evento', 'evento_nome',
-                 'tipo_no_evento', 'camisa', 'camisa_cor', 'tamanho', 'forma_pagamento',
-                 'valor_pago', 'pagamento', 'camisa_entregue', 'observacao']
-        
+        fields = ['id', 'data', 'nome_completo', 'apelido', 'cpf', 'whatsapp',
+                 'congregacao', 'congregacao_nome', 'evento', 'evento_nome', 
+                 'tipo_no_evento', 'camisa', 'camisa_cor', 'camisa_estilo',
+                 'tamanho', 'camisa_entregue', 'forma_pagamento',
+                 'pagamento_feito', 'valor_pago', 'observacao']
+
 class RemessaSerializer(serializers.ModelSerializer):
     evento_nome = serializers.ReadOnlyField(source='evento.nome')
 
