@@ -534,7 +534,7 @@ export default function InscricoesPage() {
                   
                   <div className="space-y-1">
                     <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Telefone do WhatsApp <span className="text-red-500">*</span>
+                      WhatsApp <span className="text-red-500">*</span>
                     </label>
                     <InputMaskWrapper 
                       mask="(99) 99999-9999"
@@ -558,6 +558,20 @@ export default function InscricoesPage() {
                       {congregacoes.map((cong, index) => (
                         <option key={index} value={cong}>{cong}</option>
                       ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                      Tipo no Evento
+                    </label>
+                    <select 
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                      defaultValue="participante"
+                    >
+                      <option value="participante">Participante</option>
+                      <option value="lideranca">Liderança</option>
+                      <option value="organizacao">Organização</option>
                     </select>
                   </div>
                   
@@ -589,34 +603,20 @@ export default function InscricoesPage() {
                       </label>
                     </div>
                   </div>
-                  
-                  <div className="space-y-2">
+
+                  <div className="space-y-1">
                     <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
-                      Estilo <span className="text-red-500">*</span>
+                      Estilo da Camisa <span className="text-red-500">*</span>
                     </label>
-                    <div className="flex space-x-6">
-                      <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
-                        <input 
-                          type="radio" 
-                          name="estilo" 
-                          value="Babylook" 
-                          className="mr-2 h-4 w-4 text-blue-600" 
-                          defaultChecked={inscritoParaEditar.estilo === "Babylook"}
-                          required 
-                        />
-                        <span className="text-black">Babylook</span>
-                      </label>
-                      <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
-                        <input 
-                          type="radio" 
-                          name="estilo" 
-                          value="Normal" 
-                          className="mr-2 h-4 w-4 text-blue-600" 
-                          defaultChecked={inscritoParaEditar.estilo === "Normal"}
-                        />
-                        <span className="text-black">Normal</span>
-                      </label>
-                    </div>
+                    <select 
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                      defaultValue={inscritoParaEditar.estilo}
+                      required
+                    >
+                      <option value="">Selecione...</option>
+                      <option value="Normal">Normal</option>
+                      <option value="Babylook">Babylook</option>
+                    </select>
                   </div>
                   
                   <div className="space-y-1">
@@ -637,6 +637,73 @@ export default function InscricoesPage() {
                       <option value="EXG">EXG</option>
                       <option value="Sob medida">Sob medida</option>
                     </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                      Forma de Pagamento
+                    </label>
+                    <select 
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                      defaultValue="especie"
+                    >
+                      <option value="especie">Espécie</option>
+                      <option value="pix">PIX</option>
+                      <option value="cartao">Cartão</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                      Valor Pago
+                    </label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                      defaultValue={inscritoParaEditar.valorPago || ""}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                      Status do Pagamento
+                    </label>
+                    <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        name="pagamento_feito"
+                        className="mr-2 h-4 w-4 text-blue-600 rounded"
+                        defaultChecked={inscritoParaEditar.status === "Confirmada"}
+                      />
+                      <span className="text-black">Pagamento Realizado</span>
+                    </label>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                      Status da Camisa
+                    </label>
+                    <label className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        name="camisa_entregue"
+                        className="mr-2 h-4 w-4 text-blue-600 rounded"
+                        defaultChecked={inscritoParaEditar.camisaEntregue || false}
+                      />
+                      <span className="text-black">Camisa Entregue</span>
+                    </label>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                      Observação
+                    </label>
+                    <textarea 
+                      rows={3}
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500"
+                      defaultValue={inscritoParaEditar.observacao || ""}
+                    ></textarea>
                   </div>
                 </div>
                 
