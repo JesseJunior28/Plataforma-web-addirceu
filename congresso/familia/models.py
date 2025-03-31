@@ -74,7 +74,6 @@ class Inscricao(models.Model):
     
     # Campos básicos da inscrição
     data = models.DateField()
-    evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
     tipo_no_evento = models.CharField(max_length=50, choices=TIPO_NO_EVENTO_CHOICES)
     
     # Dados do participante diretamente na inscrição
@@ -82,7 +81,7 @@ class Inscricao(models.Model):
     apelido = models.CharField(max_length=255, blank=True, null=True)
     cpf = models.CharField(max_length=14, blank=True, null=True)
     whatsapp = models.CharField(max_length=20, blank=True, null=True)
-    congregacao = models.ForeignKey(Congregacao, on_delete=models.PROTECT, null=True)
+    congregacao = models.CharField(max_length=255, default="Não informada")  # Adicionado default
     
     # Dados da camisa simplificados
     cor_camisa = models.CharField(max_length=50, verbose_name="Cor da camisa")
@@ -116,7 +115,7 @@ class Inscricao(models.Model):
     updated_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Inscrição de {self.nome_completo} para {self.evento}"
+        return f"Inscrição de {self.nome_completo}"
 
     def valor_pago_formatado(self):
         return f"R$ {self.valor_pago:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")

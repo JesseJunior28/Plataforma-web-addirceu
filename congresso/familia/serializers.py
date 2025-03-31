@@ -20,18 +20,23 @@ class UsuarioSerializer(serializers.ModelSerializer):
                  'telefone_whatsapp', 'cpf', 'observacao']
 
 class InscricaoSerializer(serializers.ModelSerializer):
-    evento_nome = serializers.ReadOnlyField(source='evento.nome')
-    congregacao_nome = serializers.ReadOnlyField(source='congregacao.nome')
+    # Adicionar campo para formatar o valor pago
+    valor_pago_formatado = serializers.SerializerMethodField()
     
     class Meta:
         model = Inscricao
         fields = [
             'id', 'data', 'nome_completo', 'apelido', 'cpf', 'whatsapp',
-            'congregacao', 'congregacao_nome', 'evento', 'evento_nome', 
-            'tipo_no_evento', 'cor_camisa', 'tamanho', 'camisa_entregue',
-            'forma_pagamento', 'pagamento_feito', 'valor_pago', 'observacao',
-            'created_at', 'updated_at'
+            'congregacao', 'tipo_no_evento', 'cor_camisa', 'estilo_camisa', 
+            'tamanho', 'camisa_entregue', 'forma_pagamento', 'pagamento_feito', 
+            'valor_pago', 'valor_pago_formatado', 'observacao', 'created_at', 'updated_at'
         ]
+    
+    def get_valor_pago_formatado(self, obj):
+        """Formata o valor pago para exibição"""
+        if obj.valor_pago is None:
+            return "R$ 0,00"
+        return f"R$ {obj.valor_pago:.2f}".replace(".", ",")
 
 class RemessaSerializer(serializers.ModelSerializer):
     evento_nome = serializers.ReadOnlyField(source='evento.nome')
@@ -47,4 +52,5 @@ class CongregacaoEventoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CongregacaoEvento
-        Fields = ['id', 'congrecacao', 'congrecacao_nome', 'evento', 'evento_nome', 'concentrador', 'concentrador_nome']
+        fields = ['id', 'congregacao', 'congregacao_nome', 'evento', 'evento_nome', 'concentrador', 'concentrador_nome']
+        # Correção: 'Fields' maiúsculo para 'fields' minúsculo, e corrigido de 'congrecacao' para 'congregacao'

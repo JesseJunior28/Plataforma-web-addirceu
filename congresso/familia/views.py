@@ -59,10 +59,6 @@ def cadastrar_participante(request):
         with transaction.atomic():
             inscricao = Inscricao()
             
-            # Campos obrigatórios
-            inscricao.evento = get_object_or_404(Evento, id=request.data.get('evento_id'))
-            inscricao.congregacao = get_object_or_404(Congregacao, id=request.data.get('congregacao_id'))
-            
             # Informações da camisa
             inscricao.cor_camisa = request.data.get('cor_camisa')
             inscricao.estilo_camisa = request.data.get('estilo_camisa', 'normal')
@@ -76,6 +72,7 @@ def cadastrar_participante(request):
             inscricao.apelido = request.data.get('apelido', '')
             inscricao.cpf = request.data.get('cpf', '')
             inscricao.whatsapp = request.data.get('whatsapp', '')
+            inscricao.congregacao = request.data.get('congregacao', '')  # Agora recebe uma string
             
             # Dados da camisa e pagamento
             inscricao.camisa_entregue = request.data.get('camisa_entregue', False)
@@ -295,62 +292,39 @@ def editar_inscricao(request, inscricao_id):
     """
     try:
         with transaction.atomic():
-            # Buscar inscrição existente
             inscricao = get_object_or_404(Inscricao, id=inscricao_id)
             
-            # Atualizar dados da inscrição
-            if 'evento_id' in request.data:
-                inscricao.evento = get_object_or_404(Evento, id=request.data['evento_id'])
+            # Atualizar informações da inscrição usando dados do request
+            campos_permitidos = [
+                'cor_camisa', 'estilo_camisa', 'congregacao', 'tamanho', 'forma_pagamento',
+                'valor_pago', 'camisa_entregue', 'pagamento_feito', 'observacao',
+                'tipo_no_evento', 'nome_completo', 'apelido', 'whatsapp', 'cpf'
+            ]
             
-            # Atualizar informações da camisa
-            if 'cor_camisa' in request.data:
-                inscricao.cor_camisa = request.data['cor_camisa']
+            for campo in campos_permitidos:
+                if campo in request.data:
+                    # Tratar valor_pago para garantir formato decimal
+                    if campo == 'valor_pago' and isinstance(request.data[campo], str):
+                        try:
+                            valor = request.data[campo].replace('.', '').replace(',', '.')
+                            setattr(inscricao, campo, float(valor))
+                        except (ValueError, TypeError):
+                            return Response({
+                                'error': f'Valor inválido para {campo}: {request.data[campo]}'
+                            }, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        setattr(inscricao, campo, request.data[campo])
             
-            if 'estilo_camisa' in request.data:
-                inscricao.estilo_camisa = request.data['estilo_camisa']
-            
-            if 'congregacao_id' in request.data:
-                inscricao.congregacao = get_object_or_404(Congregacao, id=request.data['congregacao_id'])
-            
-            if 'tamanho' in request.data:
-                inscricao.tamanho = request.data['tamanho']
-            
-            if 'forma_pagamento' in request.data:
-                inscricao.forma_pagamento = request.data['forma_pagamento']
-            
-            if 'valor_pago' in request.data:
-                inscricao.valor_pago = request.data['valor_pago']
-            
-            if 'camisa_entregue' in request.data:
-                inscricao.camisa_entregue = request.data['camisa_entregue']
-                
-            if 'pagamento_feito' in request.data:
-                inscricao.pagamento_feito = request.data['pagamento_feito']
-            
-            if 'observacao' in request.data:
-                inscricao.observacao = request.data['observacao']
-            
-            if 'tipo_no_evento' in request.data:
-                inscricao.tipo_no_evento = request.data['tipo_no_evento']
-                
-            # Atualizar dados do participante
-            if 'nome_completo' in request.data:
-                inscricao.nome_completo = request.data['nome_completo']
-                
-            if 'apelido' in request.data:
-                inscricao.apelido = request.data['apelido']
-                
-            if 'whatsapp' in request.data:
-                inscricao.whatsapp = request.data['whatsapp']
-                
-            if 'cpf' in request.data:
-                inscricao.cpf = request.data['cpf']
+            # Atualizar data de modificação
+            inscricao.updated_at = timezone.now()
             
             inscricao.save()
             
+            # Retornar a inscrição atualizada usando o serializer
+            serializer = InscricaoSerializer(inscricao)
             return Response({
                 'message': 'Inscrição atualizada com sucesso!',
-                'inscricao_id': inscricao.id
+                'inscricao': serializer.data
             }, status=status.HTTP_200_OK)
     
     except Exception as e:
