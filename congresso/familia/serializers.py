@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Usuario, Congregacao, Evento, Inscricao, Remessa, CongregacaoEvento
+from .models import Usuario, Congregacao, Evento, Inscricao, Remessa, CongregacaoEvento, Login
 
 class CongregacaoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,4 +53,8 @@ class CongregacaoEventoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CongregacaoEvento
         fields = ['id', 'congregacao', 'congregacao_nome', 'evento', 'evento_nome', 'concentrador', 'concentrador_nome']
-        # Correção: 'Fields' maiúsculo para 'fields' minúsculo, e corrigido de 'congrecacao' para 'congregacao'
+
+class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Login
+        fields = ['id', 'email', 'nome', 'is_admin']

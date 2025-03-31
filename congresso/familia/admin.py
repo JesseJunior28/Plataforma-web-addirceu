@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Congregacao, Usuario, Evento, CongregacaoEvento, Inscricao
+from .models import Congregacao, Usuario, Evento, CongregacaoEvento, Inscricao, Login
 
 @admin.register(Congregacao)
 class CongregacaoAdmin(admin.ModelAdmin):
@@ -29,6 +29,12 @@ class InscricaoAdmin(admin.ModelAdmin):
     list_filter = ('congregacao', 'cor_camisa', 'tamanho', 'pagamento_feito', 'camisa_entregue')
     search_fields = ('nome_completo', 'cpf', 'whatsapp')
     list_editable = ('cor_camisa', 'tamanho')
+
+@admin.register(Login)
+class LoginAdmin(admin.ModelAdmin):
+    list_display = ('email', 'nome', 'is_admin', 'created_at')
+    search_fields = ('email', 'nome')
+    list_filter = ('is_admin',)
 
 
 

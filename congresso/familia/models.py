@@ -119,3 +119,13 @@ class Inscricao(models.Model):
 
     def valor_pago_formatado(self):
         return f"R$ {self.valor_pago:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+class Login(models.Model):
+    email = models.EmailField(unique=True)
+    senha = models.CharField(max_length=50)
+    nome = models.CharField(max_length=100)
+    is_admin = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.email

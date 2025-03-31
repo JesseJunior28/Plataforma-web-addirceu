@@ -3,9 +3,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, schema
 from django.shortcuts import get_object_or_404
-from .models import Usuario, Congregacao, Evento, Inscricao
+from .models import Usuario, Congregacao, Evento, Inscricao, Login
 from .serializers import (CongregacaoSerializer, EventoSerializer,
-                        UsuarioSerializer, InscricaoSerializer)
+                        UsuarioSerializer, InscricaoSerializer, LoginSerializer)
 from django.db import transaction
 from django.utils import timezone
 from drf_yasg.utils import swagger_auto_schema
@@ -456,68 +456,69 @@ def api_root(request):
     """
     host = request.get_host()
     scheme = request.scheme
-    
-    # Corrigir a construção da URL base
-    base_url = f"{scheme}://{host}"
-    
-    # Certifique-se de que base_url não termina com barra
-    if base_url.endswith('/'):
-        base_url = base_url[:-1]
+    base_url = f"{scheme}://{host}/api"
     
     return Response({
         'endpoints': {
+            'autenticacao': {
+                'login': f"{base_url}/auth/login/",
+                'register': f"{base_url}/auth/register/"
+            },
             'congregacoes': {
-                'listar': f"{base_url}/api/congregacoes/",
-                'cadastrar': f"{base_url}/api/congregacao/cadastro/",
-                'deletar': f"{base_url}/api/congregacao/deletar/<congregacao_id>/"
+                'listar': f"{base_url}/congregacoes/",
+                'cadastrar': f"{base_url}/congregacao/cadastro/",
+                'deletar': f"{base_url}/congregacao/deletar/<id>/"
             },
             'eventos': {
-                'listar': f"{base_url}/api/eventos/",
-                'cadastrar': f"{base_url}/api/evento/cadastro/",
-                'deletar': f"{base_url}/api/evento/deletar/<evento_id>/"
+                'listar': f"{base_url}/eventos/",
+                'cadastrar': f"{base_url}/evento/cadastro/",
+                'deletar': f"{base_url}/evento/deletar/<id>/"
             },
-            'inscricoes': f"{base_url}/api/inscricoes/",
-            'cadastro_participante': {
-                'url': f"{base_url}/api/participante/cadastro/",
-                'metodo': 'POST',
-                'campos_obrigatorios': [
-                    'evento_id', 
-                    'cor_camisa', 
-                    'tamanho', 
-                    'nome_completo', 
-                    'congregacao_id'
-                ],
-                'campos_opcionais': [
-                    'apelido', 
-                    'cpf', 
-                    'whatsapp', 
-                    'forma_pagamento', 
-                    'pagamento_feito', 
-                    'valor_pago', 
-                    'camisa_entregue', 
-                    'observacao',
-                    'tipo_no_evento'
-                ],
-                'exemplo': {
-                    'evento_id': 1,
-                    'cor_camisa': 'Azul',
-                    'congregacao_id': 1,
-                    'tamanho': 'G',
+            'inscricoes': {
+                'listar': f"{base_url}/inscricoes/",
+                'cadastrar': f"{base_url}/participante/cadastro/",
+                'editar': f"{base_url}/inscricao/editar/<id>/",
+                'deletar': f"{base_url}/inscricao/deletar/<id>/"
+            }
+        },
+        'exemplos': {
+            'login': {
+                'method': 'POST',
+                'payload': {
+                    'email': 'usuario@exemplo.com',
+                    'senha': '123456'
+                }
+            },
+            'register': {
+                'method': 'POST',
+                'payload': {
+                    'email': 'usuario@exemplo.com',
+                    'senha': '123456',
+                    'nome': 'Nome do Usuário',
+                    'is_admin': False
+                }
+            },
+            'cadastrar_inscricao': {
+                'method': 'POST',
+                'payload': {
                     'nome_completo': 'Nome do Participante',
                     'apelido': 'Apelido',
                     'cpf': '123.456.789-00',
-                    'whatsapp': '83999999999',
-                    'camisa_entregue': False,
+                    'whatsapp': '86999999999',
+                    'congregacao': 'Sede',
+                    'cor_camisa': 'preta',
+                    'estilo_camisa': 'normal',
+                    'tamanho': 'G',
                     'forma_pagamento': 'especie',
-                    'pagamento_feito': True,
                     'valor_pago': 30.00,
-                    'tipo_no_evento': 'participante'
+                    'pagamento_feito': False,
+                    'camisa_entregue': False,
+                    'observacao': ''
                 }
-            },
-            'editar_inscricao': f"{base_url}/api/inscricao/editar/<inscricao_id>/",
-            'deletar_inscricao': f"{base_url}/api/inscricao/deletar/<inscricao_id>/",
+            }
         },
         'documentacao': 'Para mais informações, consulte o README do projeto',
+        'versao': '1.0.0',
         'devs': ['Ytallo Gomes', 'Jesse', 'Ramielke']
     })
 
@@ -533,6 +534,95 @@ def listar_inscricoes(request):
             'inscricoes': serializer.data,
             'instrucoes': 'Para editar uma inscrição específica, use a URL /api/inscricao/editar/{id}/'
         })
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def login(request):
+    """
+    Realiza o login do usuário
+    """
+    try:
+        email = request.data.get('email')
+        senha = request.data.get('senha')
+        
+        if not email or not senha:
+            return Response({
+                'error': 'Email e senha são obrigatórios'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            usuario = Login.objects.get(email=email, senha=senha)
+            serializer = LoginSerializer(usuario)
+            return Response({
+                'message': 'Login realizado com sucesso!',
+                'usuario': serializer.data
+            })
+        except Login.DoesNotExist:
+            return Response({
+                'error': 'Email ou senha inválidos'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def register(request):
+    """
+    Cadastra um novo usuário
+    """
+    try:
+        email = request.data.get('email')
+        senha = request.data.get('senha')
+        nome = request.data.get('nome')
+        is_admin = request.data.get('is_admin', False)
+        
+        if not email or not senha or not nome:
+            return Response({
+                'error': 'Email, senha e nome são obrigatórios'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Verificar se já existe um usuário com este email
+        if Login.objects.filter(email=email).exists():
+            return Response({
+                'error': 'Email já cadastrado'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        usuario = Login.objects.create(
+            email=email,
+            senha=senha,
+            nome=nome,
+            is_admin=is_admin
+        )
+        
+        serializer = LoginSerializer(usuario)
+        return Response({
+            'message': 'Usuário cadastrado com sucesso!',
+            'usuario': serializer.data
+        }, status=status.HTTP_201_CREATED)
+            
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def logout_view(request):
+    """
+    Realiza o logout do usuário
+    """
+    try:
+        # Aqui você pode adicionar lógica adicional se necessário
+        # Por exemplo, invalidar tokens, limpar sessões, etc.
+        
+        return Response({
+            'message': 'Logout realizado com sucesso!'
+        }, status=status.HTTP_200_OK)
+            
     except Exception as e:
         return Response({
             'error': str(e)
