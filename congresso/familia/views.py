@@ -65,6 +65,7 @@ def cadastrar_participante(request):
             
             # Informações da camisa
             inscricao.cor_camisa = request.data.get('cor_camisa')
+            inscricao.estilo_camisa = request.data.get('estilo_camisa', 'normal')
             inscricao.tamanho = request.data.get('tamanho', 'G')
             
             inscricao.data = timezone.now().date()
@@ -304,6 +305,9 @@ def editar_inscricao(request, inscricao_id):
             # Atualizar informações da camisa
             if 'cor_camisa' in request.data:
                 inscricao.cor_camisa = request.data['cor_camisa']
+            
+            if 'estilo_camisa' in request.data:
+                inscricao.estilo_camisa = request.data['estilo_camisa']
             
             if 'congregacao_id' in request.data:
                 inscricao.congregacao = get_object_or_404(Congregacao, id=request.data['congregacao_id'])

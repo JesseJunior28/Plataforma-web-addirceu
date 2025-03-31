@@ -86,6 +86,11 @@ class Inscricao(models.Model):
     
     # Dados da camisa simplificados
     cor_camisa = models.CharField(max_length=50, verbose_name="Cor da camisa")
+    ESTILO_CHOICES = [
+        ('normal', 'Normal'),
+        ('babylook', 'Babylook'),
+    ]
+    estilo_camisa = models.CharField(max_length=10, choices=ESTILO_CHOICES, default='normal')
     TAMANHO_CHOICES = [
         ('P', 'P'),
         ('M', 'M'),
