@@ -10,7 +10,6 @@ urlpatterns = [
     path('evento/deletar/<int:evento_id>/', views.deletar_evento, name='deletar_evento'),
     path('congregacoes/', views.listar_congregacoes, name='listar_congregacoes'),
     path('eventos/', views.listar_eventos, name='listar_eventos'),
-    path('camisas/', views.listar_camisas, name='listar_camisas'),
     path('inscricoes/', views.listar_inscricoes, name='listar_inscricoes'),
     path('inscricao/editar/<int:inscricao_id>/', views.editar_inscricao, name='editar_inscricao'),
     path('inscricao/deletar/<int:inscricao_id>/', views.deletar_inscricao, name='deletar_inscricao'),

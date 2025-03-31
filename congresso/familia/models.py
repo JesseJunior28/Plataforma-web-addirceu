@@ -46,24 +46,6 @@ class CongregacaoEvento(models.Model):
     def __str__(self):
         return f"{self.congregacao} - {self.evento}" 
 
-class Camisa(models.Model):
-    ESTILO_CHOICES = [
-        ('normal', 'Normal'),
-        ('babylook', 'Babylook'),
-    ]
-
-    cor = models.CharField(max_length=50)
-    estilo = models.CharField(max_length=10, choices=ESTILO_CHOICES)
-    flg_p = models.BooleanField(verbose_name= "P")
-    flg_m = models.BooleanField(verbose_name= "M")
-    flg_g = models.BooleanField(verbose_name= "G")
-    flg_gg = models.BooleanField(verbose_name= "GG")
-    flg_exg = models.BooleanField(verbose_name= "EXG")
-    flg_sobmedida = models.BooleanField(verbose_name= "Sob-Medida")
-
-    def __str__(self):
-        return f"Camisa {self.cor} - {self.get_estilo_display()}"
-
 class Remessa(models.Model):
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
     data_pedido = models.DateField()
@@ -97,14 +79,13 @@ class Inscricao(models.Model):
     
     # Dados do participante diretamente na inscrição
     nome_completo = models.CharField(max_length=255, default="Participante")
-    apelido = models.CharField(max_length=255, blank=True, null=True)  # Campo apelido está presente
+    apelido = models.CharField(max_length=255, blank=True, null=True)
     cpf = models.CharField(max_length=14, blank=True, null=True)
     whatsapp = models.CharField(max_length=20, blank=True, null=True)
     congregacao = models.ForeignKey(Congregacao, on_delete=models.PROTECT, null=True)
     
-    # Dados da camisa
-    camisa = models.ForeignKey(Camisa, on_delete=models.CASCADE)
-    data_entrega_camisa = models.DateField(null=True, blank=True)
+    # Dados da camisa simplificados
+    cor_camisa = models.CharField(max_length=50, verbose_name="Cor da camisa")
     TAMANHO_CHOICES = [
         ('P', 'P'),
         ('M', 'M'),

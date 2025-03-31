@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 import locale
-from .models import Usuario, Evento, Congregacao, CongregacaoEvento, Camisa, Remessa, Inscricao  
+from .models import Usuario, Evento, Congregacao, CongregacaoEvento, Remessa, Inscricao  
 
 class InscricaoAdmin(admin.ModelAdmin):
     list_display = ("id", "evento", "display_valor_pago", "forma_pagamento")
@@ -18,7 +18,6 @@ admin.site.register(Usuario)
 admin.site.register(Evento)
 admin.site.register(Congregacao)
 admin.site.register(CongregacaoEvento)
-admin.site.register(Camisa)
 admin.site.register(Remessa)
 admin.site.register(Inscricao, InscricaoAdmin)
 
