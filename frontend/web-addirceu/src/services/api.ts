@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import authService from './authService';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
@@ -14,24 +14,27 @@ const api = axios.create({
 });
 
 // Função para verificar erro de rede
-const isNetworkError = (error) => {
-  return !error.response && error.request;
+const isNetworkError = (error: AxiosError): boolean => {
+  return !error.response && !!error.request;
 };
 
 // Função auxiliar para formatar mensagens de erro
-export const formatErrorMessage = (error) => {
+export const formatErrorMessage = (error: AxiosError): string => {
   if (isNetworkError(error)) {
     return 'Erro de conexão. Verifique sua internet ou tente novamente mais tarde.';
   }
   
   if (error.response) {
     const { data } = error.response;
-    if (data.error) {
-      return data.error;
-    } else if (data.message) {
-      return data.message;
-    } else if (data.detail) {
-      return data.detail;
+    // Usando type assertion para evitar erros de tipagem
+    const errorData = data as any;
+    
+    if (errorData.error) {
+      return errorData.error;
+    } else if (errorData.message) {
+      return errorData.message;
+    } else if (errorData.detail) {
+      return errorData.detail;
     }
   }
   
@@ -40,14 +43,14 @@ export const formatErrorMessage = (error) => {
 
 // Interceptor para tratar erros de requisição
 api.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('token');
-    if (token) {
+  (config: InternalAxiosRequestConfig) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  error => {
+  (error: any) => {
     console.error('Erro ao preparar requisição:', error);
     return Promise.reject(error);
   }
@@ -56,13 +59,14 @@ api.interceptors.request.use(
 // Interceptor para tratar erros de resposta
 api.interceptors.response.use(
   response => response,
-  error => {
+  (error: AxiosError) => {
     if (error.response) {
       // O servidor respondeu com um status de erro
       console.error('Erro na resposta:', error.response.data);
       
       // Tratamento específico por código de status
-      switch (error.response.status) {
+      const status = error.response.status;
+      switch (status) {
         case 400:
           console.error('Requisição inválida:', error.response.data);
           break;
@@ -80,7 +84,7 @@ api.interceptors.response.use(
           console.error('Erro interno do servidor');
           break;
         default:
-          console.error(`Erro ${error.response.status}`);
+          console.error(`Erro ${status}`);
       }
     } else if (error.request) {
       // A requisição foi feita mas não houve resposta

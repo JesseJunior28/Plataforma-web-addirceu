@@ -6,15 +6,42 @@ import { InputMaskWrapper } from '@/components/InputMaskWrapper';
 import participanteService from '../../../../../service/participanteService';
 import congregacaoService from '../../../../../service/congregacaoService';
 
+interface Congresso {
+  id: number;
+  titulo: string;
+  descricao: string;
+  data: string;
+  imagem: string;
+}
+
+interface Inscrito {
+  id: number;
+  nome_completo: string;
+  apelido?: string;
+  cpf?: string;
+  whatsapp: string;
+  congregacao: string;
+  tipo_no_evento: string;
+  cor_camisa: string;
+  estilo_camisa: string;
+  tamanho: string;
+  forma_pagamento?: string;
+  valor_pago?: number;
+  valor_pago_formatado?: string;
+  pagamento_feito: boolean;
+  camisa_entregue: boolean;
+  observacao?: string;
+}
+
 export default function InscricoesPage() {
   const [modalAberto, setModalAberto] = useState(false);
   const [modalListagemAberto, setModalListagemAberto] = useState(false);
   const [modalEdicaoAberto, setModalEdicaoAberto] = useState(false);
-  const [congressoSelecionado, setCongressoSelecionado] = useState(null);
-  const [inscritoParaEditar, setInscritoParaEditar] = useState(null);
-  const [inscritos, setInscritos] = useState([]);
+  const [congressoSelecionado, setCongressoSelecionado] = useState<Congresso | null>(null);
+  const [inscritoParaEditar, setInscritoParaEditar] = useState<Inscrito | null>(null);
+  const [inscritos, setInscritos] = useState<Inscrito[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [termoPesquisa, setTermoPesquisa] = useState('');
 
   // Lista fixa de congregações
@@ -39,9 +66,9 @@ export default function InscricoesPage() {
     }
   ];
 
-  const abrirModal = (congressoId) => {
+  const abrirModal = (congressoId: number) => {
     const congresso = congressos.find(c => c.id === congressoId);
-    setCongressoSelecionado(congresso);
+    setCongressoSelecionado(congresso || null);
     setModalAberto(true);
   };
 
@@ -50,13 +77,13 @@ export default function InscricoesPage() {
     setCongressoSelecionado(null);
   };
 
-  const abrirModalListagem = (congressoId) => {
+  const abrirModalListagem = (congressoId: number) => {
     const congresso = congressos.find(c => c.id === congressoId);
-    setCongressoSelecionado(congresso);
+    setCongressoSelecionado(congresso || null);
     setModalListagemAberto(true);
   };
 
-  const abrirModalEdicao = (inscrito) => {
+  const abrirModalEdicao = (inscrito: Inscrito) => {
     console.log("Abrindo modal de edição para", inscrito);
     setInscritoParaEditar(inscrito);
     setModalListagemAberto(false);
@@ -68,35 +95,35 @@ export default function InscricoesPage() {
     setInscritoParaEditar(null);
   };
 
-  const salvarEdicao = async (e) => {
+  const salvarEdicao = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
+    const formData = new FormData(e.currentTarget);
     
     try {
       setLoading(true);
       
-      const valorPagoStr = formData.get('valor_pago');
+      const valorPagoStr = formData.get('valor_pago') as string;
       let valorPago = 0;
       
-      if (valorPagoStr && typeof valorPagoStr === 'string') {
+      if (valorPagoStr) {
         valorPago = parseFloat(valorPagoStr.replace(/\./g, '').replace(',', '.'));
       }
       
       const inscricaoData = {
-        forma_pagamento: formData.get('forma_pagamento'),
+        forma_pagamento: formData.get('forma_pagamento') as string,
         valor_pago: valorPago,
         pagamento_feito: formData.get('pagamento_feito') === 'on',
         camisa_entregue: formData.get('camisa_entregue') === 'on',
-        observacao: formData.get('observacao')
+        observacao: formData.get('observacao') as string
       };
 
-      await participanteService.editarInscricao(inscritoParaEditar.id, inscricaoData);
+      await participanteService.editarInscricao(inscritoParaEditar!.id, inscricaoData);
       alert('Inscrição atualizada com sucesso!');
       fecharModalEdicao();
       
       // Recarregar a lista após a edição
       setModalListagemAberto(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao atualizar:', error);
       alert('Erro ao atualizar inscrição: ' + error.message);
     } finally {
@@ -104,14 +131,14 @@ export default function InscricoesPage() {
     }
   };
 
-  const deletarInscricao = async (inscritoId) => {
+  const deletarInscricao = async (inscritoId: number) => {
     if (window.confirm('Tem certeza que deseja excluir esta inscrição?')) {
       try {
         setLoading(true);
         await participanteService.deletarInscricao(inscritoId);
         alert('Inscrição excluída com sucesso!');
         carregarInscricoes(); // Recarrega a lista após deletar
-      } catch (error) {
+      } catch (error: any) {
         console.error('Erro ao deletar:', error);
         alert('Erro ao excluir inscrição: ' + error.message);
       } finally {
@@ -133,7 +160,7 @@ export default function InscricoesPage() {
       } else {
         setInscritos([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao carregar inscrições:', error);
       setError(error.message);
     } finally {
@@ -228,37 +255,37 @@ export default function InscricoesPage() {
             <div className="p-8 bg-gradient-to-br from-blue-50 to-white">
               <form className="space-y-8 relative" onSubmit={async (e) => {
                 e.preventDefault();
-                const formData = new FormData(e.target);
+                const formData = new FormData(e.currentTarget);
                 
                 try {
-                  const valorPagoStr = formData.get('valor_pago');
+                  const valorPagoStr = formData.get('valor_pago') as string;
                   let valorPago = 0;
                   
-                  if (valorPagoStr && typeof valorPagoStr === 'string') {
+                  if (valorPagoStr) {
                     valorPago = parseFloat(valorPagoStr.replace(/\./g, '').replace(',', '.'));
                   }
                   
                   const inscricaoData = {
-                    nome_completo: formData.get('nome_completo'),
-                    apelido: formData.get('apelido'),
-                    cpf: formData.get('cpf'),
-                    whatsapp: formData.get('whatsapp'),
-                    congregacao: formData.get('congregacao'),
-                    tipo_no_evento: formData.get('tipo_no_evento'),
-                    cor_camisa: formData.get('cor_camisa'),
-                    estilo_camisa: formData.get('estilo_camisa'),
-                    tamanho: formData.get('tamanho'),
-                    forma_pagamento: formData.get('forma_pagamento'),
+                    nome_completo: formData.get('nome_completo') as string,
+                    apelido: formData.get('apelido') as string,
+                    cpf: formData.get('cpf') as string,
+                    whatsapp: formData.get('whatsapp') as string,
+                    congregacao: formData.get('congregacao') as string,
+                    tipo_no_evento: formData.get('tipo_no_evento') as string,
+                    cor_camisa: formData.get('cor_camisa') as string,
+                    estilo_camisa: formData.get('estilo_camisa') as string,
+                    tamanho: formData.get('tamanho') as string,
+                    forma_pagamento: formData.get('forma_pagamento') as string,
                     valor_pago: valorPago,
                     pagamento_feito: formData.get('pagamento_feito') === 'on',
                     camisa_entregue: formData.get('camisa_entregue') === 'on',
-                    observacao: formData.get('observacao')
+                    observacao: formData.get('observacao') as string
                   };
 
                   await participanteService.cadastrarParticipante(inscricaoData);
                   alert('Inscrição realizada com sucesso!');
                   fecharModal();
-                } catch (error) {
+                } catch (error: any) {
                   console.error('Erro ao cadastrar:', error);
                   alert('Erro ao realizar inscrição: ' + error.message);
                 }
@@ -511,7 +538,7 @@ export default function InscricoesPage() {
         <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 backdrop-blur-md bg-black/20">
           <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-blue-800">Inscritos - {congressoSelecionado.titulo}</h2>
+              <h2 className="text-2xl font-bold text-blue-800">Inscritos - {congressoSelecionado?.titulo}</h2>
               <button 
                 onClick={() => setModalListagemAberto(false)}
                 className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100"
@@ -684,7 +711,7 @@ export default function InscricoesPage() {
                       name="cpf"
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 text-gray-700"
                       defaultValue={inscritoParaEditar.cpf}
-                      readOnly
+                      disabled={true}
                     />
                   </div>
                   <div className="space-y-1">
@@ -697,7 +724,7 @@ export default function InscricoesPage() {
                       name="whatsapp"
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 text-gray-700"
                       defaultValue={inscritoParaEditar.whatsapp}
-                      readOnly
+                      disabled={true}
                     />
                   </div>
                   <div className="space-y-1">

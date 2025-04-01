@@ -3,10 +3,10 @@ import React from 'react';
 import authService from '@/services/authService';
 import { useRouter } from 'next/navigation';
 
-export default function DashboardPage() {
+const DashboardPage: React.FC = () => {
   const router = useRouter();
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     authService.logout();
     router.push('/login');
   };
@@ -36,4 +36,6 @@ export default function DashboardPage() {
       </button>
     </div>
   );
-}
+};
+
+export default DashboardPage;

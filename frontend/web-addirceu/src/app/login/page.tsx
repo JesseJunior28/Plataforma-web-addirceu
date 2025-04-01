@@ -4,6 +4,18 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import authService from '@/services/authService';
 
+interface LoginResponse {
+  usuario: {
+    id: string;
+    email: string;
+    // ...outros campos do usuário se necessário
+  } | null;
+}
+
+interface LoginError {
+  message: string;
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -17,23 +29,21 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await authService.login(email, senha);
+      const response: LoginResponse = await authService.login(email, senha);
       
       if (response.usuario) {
-        // Se o login for bem sucedido, redireciona para o dashboard
         router.push('/dashboard/inscricoes');
       } else {
         setError('Credenciais inválidas');
       }
-    } catch (error) {
-      setError(error.message || 'Email ou senha inválidos');
+    } catch (error: unknown) {
+      const loginError = error as LoginError;
+      setError(loginError.message || 'Email ou senha inválidos');
       console.error('Erro de login:', error);
     } finally {
       setLoading(false);
     }
   };
-
-  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-800">
