@@ -33,13 +33,7 @@ export default function LoginPage() {
     }
   };
 
-  // Verificar se já está logado
-  useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (currentUser) {
-      router.push('/dashboard/inscricoes');
-    }
-  }, [router]);
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-800">
