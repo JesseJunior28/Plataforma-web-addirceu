@@ -22,6 +22,7 @@ interface Inscrito {
   whatsapp: string;
   congregacao: string;
   tipo_no_evento: string;
+  tipo_evento?: string;
   cor_camisa: string;
   estilo_camisa: string;
   tamanho: string;
@@ -54,6 +55,13 @@ export default function InscricoesPage() {
     "Sub dirceu oi",
     "Tancredo Neves",
     "Outra"
+  ];
+
+  // Lista fixa de tipos de evento
+  const tiposEvento = [
+    "Congresso de Criança",
+    "Congresso de Mulheres",
+    "Congresso de Homens"
   ];
 
   const congressos = [
@@ -271,7 +279,8 @@ export default function InscricoesPage() {
                     cpf: formData.get('cpf') as string,
                     whatsapp: formData.get('whatsapp') as string,
                     congregacao: formData.get('congregacao') as string,
-                    tipo_no_evento: formData.get('tipo_no_evento') as string,
+                    tipo_no_evento: formData.get('tipo_no_evento') as string, // Aqui vai o tipo: participante, concentrador, etc
+                    tipo_evento: formData.get('tipo_evento') as string, // Aqui vai o tipo do congresso: Mulheres, Crianças, etc
                     cor_camisa: formData.get('cor_camisa') as string,
                     estilo_camisa: formData.get('estilo_camisa') as string,
                     tamanho: formData.get('tamanho') as string,
@@ -293,6 +302,26 @@ export default function InscricoesPage() {
                 <div className="absolute inset-0 bg-blue-50/50 backdrop-blur-3xl -z-10 rounded-xl"></div>
                 <div className="bg-white p-6 rounded-xl shadow-lg shadow-blue-100 space-y-6 border border-blue-100">
                   <input type="hidden" name="evento_id" value={congressoSelecionado.id} />
+                  
+                  {/* Novo campo de tipo de evento */}
+                  <div className="space-y-1">
+                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                      Tipo do Evento <span className="text-red-500">*</span>
+                    </label>
+                    <select 
+                      name="tipo_evento"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
+                      required
+                    >
+                      <option value="">Selecione o tipo de evento...</option>
+                      {tiposEvento.map((tipo, index) => (
+                        <option key={index} value={tipo}>
+                          {tipo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
                   <div className="space-y-1">
                     <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
                       Nome completo <span className="text-red-500">*</span>
@@ -677,6 +706,27 @@ export default function InscricoesPage() {
               <form className="space-y-8 relative" onSubmit={salvarEdicao}>
                 <div className="absolute inset-0 bg-blue-50/50 backdrop-blur-3xl -z-10 rounded-xl"></div>
                 <div className="bg-white p-6 rounded-xl shadow-lg shadow-blue-100 space-y-6 border border-blue-100">
+                  
+                  {/* Campo tipo de evento (somente visualização) */}
+                  <div className="space-y-1">
+                    <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
+                      Evento
+                    </label>
+                    <select 
+                      name="tipo_evento"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 text-gray-700 appearance-none"
+                      defaultValue={inscritoParaEditar.tipo_evento || ""}
+                      disabled
+                    >
+                      <option value="">Não especificado</option>
+                      {tiposEvento.map((tipo, index) => (
+                        <option key={index} value={tipo}>
+                          {tipo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
                   <div className="space-y-1">
                     <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
                       Nome completo <span className="text-red-500">*</span>

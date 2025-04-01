@@ -35,6 +35,7 @@ from django.core.exceptions import ValidationError
             'pagamento_feito': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Se o pagamento foi realizado'),
             'valor_pago': openapi.Schema(type=openapi.TYPE_NUMBER, description='Valor pago'),
             'observacao': openapi.Schema(type=openapi.TYPE_STRING, description='Observação'),
+            'tipo_evento': openapi.Schema(type=openapi.TYPE_STRING, description='Tipo do evento (texto livre)'),
         }
     ),
     responses={
@@ -66,6 +67,7 @@ def cadastrar_participante(request):
             
             inscricao.data = timezone.now().date()
             inscricao.tipo_no_evento = request.data.get('tipo_no_evento', 'participante')
+            inscricao.tipo_evento = request.data.get('tipo_evento', '')  # Campo de texto livre
             
             # Dados do participante
             inscricao.nome_completo = request.data.get('nome_completo', 'Participante')
@@ -277,6 +279,7 @@ def listar_eventos(request):
             'camisa_entregue': openapi.Schema(type=openapi.TYPE_BOOLEAN),
             'observacao': openapi.Schema(type=openapi.TYPE_STRING),
             'tipo_no_evento': openapi.Schema(type=openapi.TYPE_STRING),
+            'tipo_evento': openapi.Schema(type=openapi.TYPE_STRING, description='Tipo do evento (texto livre)'),
         }
     ),
     responses={
@@ -298,7 +301,7 @@ def editar_inscricao(request, inscricao_id):
             campos_permitidos = [
                 'cor_camisa', 'estilo_camisa', 'congregacao', 'tamanho', 'forma_pagamento',
                 'valor_pago', 'camisa_entregue', 'pagamento_feito', 'observacao',
-                'tipo_no_evento', 'nome_completo', 'apelido', 'whatsapp', 'cpf'
+                'tipo_no_evento', 'tipo_evento', 'nome_completo', 'apelido', 'whatsapp', 'cpf'
             ]
             
             for campo in campos_permitidos:
@@ -509,6 +512,7 @@ def api_root(request):
                     'cor_camisa': 'preta',
                     'estilo_camisa': 'normal',
                     'tamanho': 'G',
+                    'tipo_evento': 'Congresso de Jovens',
                     'forma_pagamento': 'especie',
                     'valor_pago': 30.00,
                     'pagamento_feito': False,

@@ -75,6 +75,7 @@ class Inscricao(models.Model):
     # Campos básicos da inscrição
     data = models.DateField()
     tipo_no_evento = models.CharField(max_length=50, choices=TIPO_NO_EVENTO_CHOICES)
+    tipo_evento = models.CharField(max_length=100, blank=True, null=True, help_text="Tipo de evento (ex: Congresso, EBD, Culto)")
     
     # Dados do participante diretamente na inscrição
     nome_completo = models.CharField(max_length=255, default="Participante")

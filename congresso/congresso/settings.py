@@ -39,17 +39,20 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Aplicações Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'familia.apps.FamiliaConfig',
+    
+    # Bibliotecas terceiras
     'rest_framework',
-    'rest_framework.authtoken',
-    'drf_yasg',
-    'corsheaders',
+    
+    # Aplicações locais
+    'familia',
+    # Adicione aqui outras aplicações do projeto
 ]
 
 MIDDLEWARE = [
