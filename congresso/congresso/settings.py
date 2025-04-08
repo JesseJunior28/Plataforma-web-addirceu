@@ -33,7 +33,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-2bznpsaqitz^dodlw(gj&5-x4b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["69.62.95.60",  
+    "api.addirceu.com.br",  
+    "app.addirceu.com.br",  
+    "localhost",  
+    "127.0.0.1"]
 
 
 # Application definition
@@ -155,6 +159,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    https://app.addirceu.com.br/
 ]
 
 CORS_ALLOW_CREDENTIALS = True
