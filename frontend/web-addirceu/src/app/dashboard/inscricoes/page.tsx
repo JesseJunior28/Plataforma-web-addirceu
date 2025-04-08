@@ -193,9 +193,7 @@ export default function InscricoesPage() {
       await participanteService.editarInscricao(inscritoParaEditar!.id, inscricaoData);
       alert('Inscrição atualizada com sucesso!');
       fecharModalEdicao();
-
-      // Recarregar a lista após a edição
-      setModalListagemAberto(true);
+      window.location.reload(); // Adiciona o refresh da página aqui
     } catch (error: any) {
       console.error('Erro ao atualizar:', error);
       alert('Erro ao atualizar inscrição: ' + error.message);
@@ -331,7 +329,7 @@ export default function InscricoesPage() {
                   className="w-10 h-10 object-contain rounded-full bg-white p-1"
                 />
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
-                  Inscrição - {congressoSelecionado.titulo} :  {congressoSelecionado.evento}
+                  Inscrição - {congressoSelecionado.titulo}
                 </h2>
               </div>
               <button
@@ -377,6 +375,7 @@ export default function InscricoesPage() {
                   await participanteService.cadastrarParticipante(inscricaoData);
                   alert('Inscrição realizada com sucesso!');
                   fecharModal();
+                  window.location.reload(); // Adiciona o refresh da página aqui
                 } catch (error: any) {
                   console.error('Erro ao cadastrar:', error);
                   alert('Erro ao realizar inscrição: ' + error.message);
@@ -649,7 +648,7 @@ export default function InscricoesPage() {
                   >
                     <path
                       fillRule="evenodd"
-                      d="M9 3.5a5.5 5.5 5.5 0 100 11 5.5 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
+                      d="M9 3.5a5.5 5.5 5.5 0 100 11 5.5 5.5 5.5 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
                       clipRule="evenodd"
                     />
                   </svg>
