@@ -221,26 +221,39 @@ export default function InscricoesPage() {
   const carregarInscricoes = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const response = await participanteService.listarInscricoes();
       console.log('Resposta da API:', response);
 
+      if (!response) {
+        throw new Error('Não foi possível obter os dados dos inscritos');
+      }
+
       let inscricoes: Inscrito[] = [];
+      
       if (response.inscricoes) {
         inscricoes = response.inscricoes;
       } else if (Array.isArray(response)) {
         inscricoes = response;
+      } else {
+        throw new Error('Formato de resposta inválido');
       }
 
-      // Filtra as inscrições pelo tipo de evento do congresso selecionado
-      const inscricoesFiltradas = inscricoes.filter((inscricao: Inscrito) => 
-        inscricao.tipo_evento === congressoSelecionado?.evento
-      );
+      if (congressoSelecionado?.evento) {
+        const inscricoesFiltradas = inscricoes.filter((inscricao: Inscrito) => 
+          inscricao.tipo_evento === congressoSelecionado.evento
+        );
+        console.log('Inscrições filtradas por evento:', inscricoesFiltradas);
+        setInscritos(inscricoesFiltradas);
+      } else {
+        setInscritos(inscricoes);
+      }
 
-      console.log('Inscrições filtradas:', inscricoesFiltradas);
-      setInscritos(inscricoesFiltradas);
     } catch (error: any) {
-      console.error('Erro ao carregar inscrições:', error);
-      setError(error.message);
+      console.error('Erro detalhado:', error);
+      setError(error.message || 'Erro ao carregar as inscrições');
+      setInscritos([]);
     } finally {
       setLoading(false);
     }
@@ -322,12 +335,11 @@ export default function InscricoesPage() {
     }
   }, [congressoSelecionado]);
 
-
   useEffect(() => {
-    if (modalListagemAberto) {
+    if (modalListagemAberto && congressoSelecionado) {
       carregarInscricoes();
     }
-  }, [modalListagemAberto]);
+  }, [modalListagemAberto, congressoSelecionado]);
 
   const inscritosFiltrados = useMemo(() => {
     return inscritos
