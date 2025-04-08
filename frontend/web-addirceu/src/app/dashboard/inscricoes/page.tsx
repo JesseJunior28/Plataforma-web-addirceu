@@ -224,7 +224,7 @@ export default function InscricoesPage() {
       const response = await participanteService.listarInscricoes();
       console.log('Resposta da API:', response);
 
-      let inscricoes = [];
+      let inscricoes: Inscrito[] = [];
       if (response.inscricoes) {
         inscricoes = response.inscricoes;
       } else if (Array.isArray(response)) {
@@ -232,7 +232,7 @@ export default function InscricoesPage() {
       }
 
       // Filtra as inscrições pelo tipo de evento do congresso selecionado
-      const inscricoesFiltradas = inscricoes.filter(inscricao => 
+      const inscricoesFiltradas = inscricoes.filter((inscricao: Inscrito) => 
         inscricao.tipo_evento === congressoSelecionado?.evento
       );
 
