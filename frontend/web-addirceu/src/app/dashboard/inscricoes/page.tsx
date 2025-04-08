@@ -240,7 +240,12 @@ export default function InscricoesPage() {
         throw new Error('Formato de resposta inválido');
       }
 
-      setInscritos(inscricoes);
+      // Filtra as inscrições pelo tipo de evento do congresso selecionado
+      const inscricoesFiltradas = inscricoes.filter(
+        inscrito => inscrito.tipo_evento === congressoSelecionado?.evento
+      );
+
+      setInscritos(inscricoesFiltradas);
 
     } catch (error: any) {
       console.error('Erro detalhado:', error);
@@ -338,8 +343,7 @@ export default function InscricoesPage() {
       .filter(inscrito => {
         const termoPesquisaLower = termoPesquisa.toLowerCase();
         return inscrito.nome_completo.toLowerCase().includes(termoPesquisaLower) ||
-               inscrito.congregacao.toLowerCase().includes(termoPesquisaLower) ||
-               (inscrito.tipo_evento || '').toLowerCase().includes(termoPesquisaLower);
+               inscrito.congregacao.toLowerCase().includes(termoPesquisaLower);
       })
       .sort((a, b) => a.nome_completo.localeCompare(b.nome_completo));
   }, [inscritos, termoPesquisa]);
@@ -724,7 +728,7 @@ export default function InscricoesPage() {
                 <div className="relative flex-1">
                   <input
                     type="text"
-                    placeholder="Pesquisar por nome, congregação ou tipo de congresso..."
+                    placeholder="Pesquisar por nome ou congregação..."
                     value={termoPesquisa}
                     onChange={(e) => setTermoPesquisa(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
