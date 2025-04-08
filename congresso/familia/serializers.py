@@ -27,9 +27,10 @@ class InscricaoSerializer(serializers.ModelSerializer):
         model = Inscricao
         fields = [
             'id', 'data', 'nome_completo', 'apelido', 'cpf', 'whatsapp',
-            'congregacao', 'tipo_no_evento', 'cor_camisa', 'estilo_camisa', 
-            'tamanho', 'camisa_entregue', 'forma_pagamento', 'pagamento_feito', 
-            'valor_pago', 'valor_pago_formatado', 'observacao', 'created_at', 'updated_at'
+            'congregacao', 'tipo_no_evento', 'tipo_evento', # Adicionado tipo_evento aqui
+            'cor_camisa', 'estilo_camisa', 'tamanho', 'camisa_entregue', 
+            'forma_pagamento', 'pagamento_feito', 'valor_pago', 'valor_pago_formatado', 
+            'observacao', 'created_at', 'updated_at'
         ]
     
     def get_valor_pago_formatado(self, obj):

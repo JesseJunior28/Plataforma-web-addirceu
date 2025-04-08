@@ -15,14 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Web Addirceu",
   description: "Plataforma web do congresso Addirceu",
-  icons: {
-    icon: [
-      {
-        url: "/logo-addirceu.png", // Assumindo que este é o nome do seu arquivo
-        sizes: "any",
-      },
-    ],
-  },
+  icons: [
+    { rel: 'icon', type: 'image/x-icon', url: '/favicon.ico' },
+    { rel: 'icon', type: 'image/png', url: '/addirceu.png' },
+    { rel: 'apple-touch-icon', url: '/addirceu.png' },
+  ],
 };
 
 export default function RootLayout({
