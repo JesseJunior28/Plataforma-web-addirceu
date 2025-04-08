@@ -240,15 +240,7 @@ export default function InscricoesPage() {
         throw new Error('Formato de resposta inválido');
       }
 
-      if (congressoSelecionado?.evento) {
-        const inscricoesFiltradas = inscricoes.filter((inscricao: Inscrito) => 
-          inscricao.tipo_evento === congressoSelecionado.evento
-        );
-        console.log('Inscrições filtradas por evento:', inscricoesFiltradas);
-        setInscritos(inscricoesFiltradas);
-      } else {
-        setInscritos(inscricoes);
-      }
+      setInscritos(inscricoes);
 
     } catch (error: any) {
       console.error('Erro detalhado:', error);
@@ -344,19 +336,13 @@ export default function InscricoesPage() {
   const inscritosFiltrados = useMemo(() => {
     return inscritos
       .filter(inscrito => {
-        // Primeiro, verifica se o inscrito pertence ao congresso selecionado
-        if (inscrito.tipo_evento !== congressoSelecionado?.evento) {
-          return false;
-        }
-
-        // Depois aplica o filtro de pesquisa em nome e congregação
         const termoPesquisaLower = termoPesquisa.toLowerCase();
         return inscrito.nome_completo.toLowerCase().includes(termoPesquisaLower) ||
-               inscrito.congregacao.toLowerCase().includes(termoPesquisaLower);
+               inscrito.congregacao.toLowerCase().includes(termoPesquisaLower) ||
+               (inscrito.tipo_evento || '').toLowerCase().includes(termoPesquisaLower);
       })
       .sort((a, b) => a.nome_completo.localeCompare(b.nome_completo));
-  }, [inscritos, termoPesquisa, congressoSelecionado]);
-
+  }, [inscritos, termoPesquisa]);
 
   return (
     <div className="space-y-6 relative">
@@ -738,7 +724,7 @@ export default function InscricoesPage() {
                 <div className="relative flex-1">
                   <input
                     type="text"
-                    placeholder="Pesquisar por nome ou congregação..."
+                    placeholder="Pesquisar por nome, congregação ou tipo de congresso..."
                     value={termoPesquisa}
                     onChange={(e) => setTermoPesquisa(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
