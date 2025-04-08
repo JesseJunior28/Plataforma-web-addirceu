@@ -297,16 +297,17 @@ def editar_inscricao(request, inscricao_id):
         with transaction.atomic():
             inscricao = get_object_or_404(Inscricao, id=inscricao_id)
             
-            # Atualizar informações da inscrição usando dados do request
+            # Atualizar campos permitidos - agora incluindo tipo_evento
             campos_permitidos = [
-                'cor_camisa', 'estilo_camisa', 'congregacao', 'tamanho', 'forma_pagamento',
-                'valor_pago', 'camisa_entregue', 'pagamento_feito', 'observacao',
-                'tipo_no_evento', 'tipo_evento', 'nome_completo', 'apelido', 'whatsapp', 'cpf'
+                'cor_camisa', 'estilo_camisa', 'congregacao', 'tamanho', 
+                'forma_pagamento', 'valor_pago', 'camisa_entregue', 
+                'pagamento_feito', 'observacao', 'tipo_no_evento', 
+                'tipo_evento',  # Garantindo que tipo_evento está incluído
+                'nome_completo', 'apelido', 'whatsapp', 'cpf'
             ]
             
             for campo in campos_permitidos:
                 if campo in request.data:
-                    # Tratar valor_pago para garantir formato decimal
                     if campo == 'valor_pago' and isinstance(request.data[campo], str):
                         try:
                             valor = request.data[campo].replace('.', '').replace(',', '.')
@@ -318,18 +319,15 @@ def editar_inscricao(request, inscricao_id):
                     else:
                         setattr(inscricao, campo, request.data[campo])
             
-            # Atualizar data de modificação
             inscricao.updated_at = timezone.now()
-            
             inscricao.save()
             
-            # Retornar a inscrição atualizada usando o serializer
             serializer = InscricaoSerializer(inscricao)
             return Response({
                 'message': 'Inscrição atualizada com sucesso!',
                 'inscricao': serializer.data
-            }, status=status.HTTP_200_OK)
-    
+            })
+            
     except Exception as e:
         return Response({
             'error': str(e)
@@ -529,14 +527,14 @@ def api_root(request):
 @api_view(['GET'])
 def listar_inscricoes(request):
     """
-    Lista todas as inscrições
+    Lista todas as inscrições com tipo_evento incluído
     """
     try:
         inscricoes = Inscricao.objects.all().order_by('-data')
         serializer = InscricaoSerializer(inscricoes, many=True)
+        # O tipo_evento já está incluído no serializer, então não precisa de modificação adicional
         return Response({
-            'inscricoes': serializer.data,
-            'instrucoes': 'Para editar uma inscrição específica, use a URL /api/inscricao/editar/{id}/'
+            'inscricoes': serializer.data
         })
     except Exception as e:
         return Response({

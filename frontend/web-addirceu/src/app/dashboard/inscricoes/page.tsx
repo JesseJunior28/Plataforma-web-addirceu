@@ -71,9 +71,9 @@ export default function InscricoesPage() {
 
   // Lista fixa de tipos de evento
   const tiposEvento = [
-    "Congresso de Criança",
+    "Congresso de Homens",
     "Congresso de Mulheres",
-    "Congresso de Homens"
+    "Congresso de Criança"
   ];
 
   const coresPorCongresso = {
@@ -107,7 +107,7 @@ export default function InscricoesPage() {
       titulo: "Congresso de Mulheres",
       descricao: "Momentos especiais de edificação, comunhão e renovação para toda a família.",
       data: "5-7 de Julho, 2025",
-      imagem: "/images/congresso-familias.jpg",
+      imagem: "/congresso_familia.jpeg",
       evento: "Congresso de Mulheres"
     },
     {
@@ -115,7 +115,7 @@ export default function InscricoesPage() {
       titulo: "Congresso de Homens",
       descricao: "Momentos especiais de edificação, comunhão e renovação para toda a família.",
       data: "11-13 de Julho, 2025",
-      imagem: "/images/congresso-familias.jpg",
+      imagem: "/congresso_familia.jpeg",
       evento: "Congresso de Homens"
     },
     {
@@ -123,7 +123,7 @@ export default function InscricoesPage() {
       titulo: "Congresso de Crianças",
       descricao: "Momentos especiais de edificação, comunhão e renovação para toda a família.",
       data: "5-7 de Julho, 2025",
-      imagem: "/images/congresso-familias.jpg",
+      imagem: "/congresso_familia.jpeg",
       evento: "Congresso de Criança"
     }
   ];
@@ -222,21 +222,96 @@ export default function InscricoesPage() {
     try {
       setLoading(true);
       const response = await participanteService.listarInscricoes();
-      console.log('Inscrições carregadas:', response);
+      console.log('Resposta da API:', response);
 
+      let inscricoes = [];
       if (response.inscricoes) {
-        setInscritos(response.inscricoes);
+        inscricoes = response.inscricoes;
       } else if (Array.isArray(response)) {
-        setInscritos(response);
-      } else {
-        setInscritos([]);
+        inscricoes = response;
       }
+
+      // Filtra as inscrições pelo tipo de evento do congresso selecionado
+      const inscricoesFiltradas = inscricoes.filter(inscricao => 
+        inscricao.tipo_evento === congressoSelecionado?.evento
+      );
+
+      console.log('Inscrições filtradas:', inscricoesFiltradas);
+      setInscritos(inscricoesFiltradas);
     } catch (error: any) {
       console.error('Erro ao carregar inscrições:', error);
       setError(error.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const exportarParaCSV = () => {
+    if (inscritosFiltrados.length === 0) {
+      alert('Não há dados para exportar.');
+      return;
+    }
+
+    // Define os headers do CSV
+    const headers = [
+      'Nome Completo',
+      'Apelido',
+      'CPF',
+      'WhatsApp',
+      'Congregação',
+      'Tipo no Evento',
+      'Tipo Evento',
+      'Cor Camisa',
+      'Estilo Camisa',
+      'Tamanho',
+      'Forma Pagamento',
+      'Valor Pago',
+      'Pagamento Feito',
+      'Camisa Entregue',
+      'Observação'
+    ];
+
+    // Mapeia os dados dos inscritos para o formato CSV
+    const dados = inscritosFiltrados.map(inscrito => [
+      inscrito.nome_completo,
+      inscrito.apelido || '',
+      inscrito.cpf || '',
+      inscrito.whatsapp,
+      inscrito.congregacao,
+      inscrito.tipo_no_evento,
+      inscrito.tipo_evento,
+      inscrito.cor_camisa,
+      inscrito.estilo_camisa,
+      inscrito.tamanho,
+      inscrito.forma_pagamento || '',
+      inscrito.valor_pago_formatado || '0,00',
+      inscrito.pagamento_feito ? 'Sim' : 'Não',
+      inscrito.camisa_entregue ? 'Sim' : 'Não',
+      inscrito.observacao || ''
+    ]);
+
+    // Cria o conteúdo do CSV
+    const csvContent = [
+      headers.join(';'),
+      ...dados.map(row => row.join(';'))
+    ].join('\n');
+
+    // Cria um Blob com o conteúdo do CSV
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    // Configura o link de download
+    link.setAttribute('href', url);
+    link.setAttribute('download', `inscritos_${congressoSelecionado?.titulo.toLowerCase().replace(/ /g, '_')}_${new Date().toLocaleDateString()}.csv`);
+    document.body.appendChild(link);
+
+    // Dispara o download
+    link.click();
+
+    // Limpa o objeto URL e remove o link
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
@@ -255,16 +330,18 @@ export default function InscricoesPage() {
   }, [modalListagemAberto]);
 
   const inscritosFiltrados = useMemo(() => {
-
-    console.log('Evento do congresso selecionado:', congressoSelecionado?.evento);
-    console.log('Eventos dos inscritos:', inscritos.map(i => i.tipo_evento));
-    if (!congressoSelecionado?.evento) return [];
-
     return inscritos
-      .filter(inscrito =>
-        /* inscrito.tipo_evento === congressoSelecionado.evento &&*/
-        inscrito.nome_completo.toLowerCase().includes(termoPesquisa.toLowerCase())
-      )
+      .filter(inscrito => {
+        // Primeiro, verifica se o inscrito pertence ao congresso selecionado
+        if (inscrito.tipo_evento !== congressoSelecionado?.evento) {
+          return false;
+        }
+
+        // Depois aplica o filtro de pesquisa em nome e congregação
+        const termoPesquisaLower = termoPesquisa.toLowerCase();
+        return inscrito.nome_completo.toLowerCase().includes(termoPesquisaLower) ||
+               inscrito.congregacao.toLowerCase().includes(termoPesquisaLower);
+      })
       .sort((a, b) => a.nome_completo.localeCompare(b.nome_completo));
   }, [inscritos, termoPesquisa, congressoSelecionado]);
 
@@ -278,10 +355,12 @@ export default function InscricoesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {congressos.map((congresso) => (
           <div key={congresso.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="h-48 bg-gray-200 relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-500">Imagem do Evento</span>
-              </div>
+            <div className="h-48 relative">
+              <img
+                src={congresso.imagem}
+                alt={`Imagem do ${congresso.titulo}`}
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-2 text-black">{congresso.titulo}</h2>
@@ -302,7 +381,7 @@ export default function InscricoesPage() {
                   onClick={() => abrirModalListagem(congresso.id)}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8-379-2.83-2.828z" />
                   </svg>
                   Inscritos
                 </button>
@@ -620,25 +699,37 @@ export default function InscricoesPage() {
           <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center">
               <h2 className="text-2xl font-bold text-blue-800">Inscritos - {congressoSelecionado?.titulo}</h2>
-              <button
-                onClick={() => setModalListagemAberto(false)}
-                className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={exportarParaCSV}
+                  className="text-green-600 hover:text-green-800 p-2 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-2"
+                  title="Exportar para CSV"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
+                  </svg>
+                  <span>Exportar CSV</span>
+                </button>
+                <button
+                  onClick={() => setModalListagemAberto(false)}
+                  className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div className="p-6">
               {/* Adicione o campo de pesquisa aqui */}
               <div className="mb-4">
-                <div className="relative">
+                <div className="relative flex-1">
                   <input
                     type="text"
-                    placeholder="Pesquisar por nome..."
+                    placeholder="Pesquisar por nome ou congregação..."
                     value={termoPesquisa}
                     onChange={(e) => setTermoPesquisa(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <svg
                     className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -678,6 +769,7 @@ export default function InscricoesPage() {
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Congregação</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo do Evento</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pagamento</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                       </tr>
@@ -693,6 +785,9 @@ export default function InscricoesPage() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm text-gray-900">{inscrito.congregacao}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-blue-600 font-medium">{inscrito.tipo_evento}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${inscrito.pagamento_feito
