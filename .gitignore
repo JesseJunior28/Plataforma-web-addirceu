@@ -73,3 +73,6 @@ MANIFEST
 *.swo
 *~
 data/
+
+# Ignorar diretório postgres
+data/postgres/

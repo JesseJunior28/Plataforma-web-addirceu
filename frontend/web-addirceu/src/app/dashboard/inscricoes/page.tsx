@@ -228,7 +228,11 @@ export default function InscricoesPage() {
     try {
       setLoading(true);
       setError(null);
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 4d9cab003796800f6f04a33e070875089eb05b10
       const response = await participanteService.listarInscricoes();
       console.log('Resposta da API:', response);
 
@@ -237,7 +241,11 @@ export default function InscricoesPage() {
       }
 
       let inscricoes: Inscrito[] = [];
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 4d9cab003796800f6f04a33e070875089eb05b10
       if (response.inscricoes) {
         inscricoes = response.inscricoes;
       } else if (Array.isArray(response)) {
