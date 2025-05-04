@@ -60,12 +60,12 @@ export default function InscricoesPage() {
     "PARQUE SUL",
     "PIÇARREIRA",
     "RENASCENÇA I",
-    "SANTA ISABEL",
     "SÃO RAIMUNDO",
     "SUB DIRCEU II",
     "TANCREDO NEVES",
     "TIMON",
     "VILA VERDE"
+
   ];
 
   // Lista fixa de tipos de evento
@@ -129,6 +129,7 @@ export default function InscricoesPage() {
 
   const id = congressoSelecionado?.id as 1 | 2 | 3 | undefined;
   const opcoesCores = id ? coresPorCongresso[id] : [];
+
 
   // Define cor selecionada automaticamente se for congresso 2 ou 3
   const corSelecionadaAuto = id === 2 || id === 3 ? opcoesCores[0]?.toUpperCase() : undefined;
@@ -226,26 +227,36 @@ export default function InscricoesPage() {
   const carregarInscricoes = async () => {
     try {
       setLoading(true);
+      setError(null);
+
       const response = await participanteService.listarInscricoes();
       console.log('Resposta da API:', response);
 
+      if (!response) {
+        throw new Error('Não foi possível obter os dados dos inscritos');
+      }
+
       let inscricoes: Inscrito[] = [];
+
       if (response.inscricoes) {
         inscricoes = response.inscricoes;
       } else if (Array.isArray(response)) {
         inscricoes = response;
+      } else {
+        throw new Error('Formato de resposta inválido');
       }
 
       // Filtra as inscrições pelo tipo de evento do congresso selecionado
-      const inscricoesFiltradas = inscricoes.filter((inscricao: Inscrito) =>
-        inscricao.tipo_evento === congressoSelecionado?.evento
+      const inscricoesFiltradas = inscricoes.filter(
+        inscrito => inscrito.tipo_evento === congressoSelecionado?.evento
       );
 
-      console.log('Inscrições filtradas:', inscricoesFiltradas);
       setInscritos(inscricoesFiltradas);
+
     } catch (error: any) {
-      console.error('Erro ao carregar inscrições:', error);
-      setError(error.message);
+      console.error('Erro detalhado:', error);
+      setError(error.message || 'Erro ao carregar as inscrições');
+      setInscritos([]);
     } finally {
       setLoading(false);
     }
@@ -327,29 +338,21 @@ export default function InscricoesPage() {
     }
   }, [congressoSelecionado]);
 
-
   useEffect(() => {
-    if (modalListagemAberto) {
+    if (modalListagemAberto && congressoSelecionado) {
       carregarInscricoes();
     }
-  }, [modalListagemAberto]);
+  }, [modalListagemAberto, congressoSelecionado]);
 
   const inscritosFiltrados = useMemo(() => {
     return inscritos
       .filter(inscrito => {
-        // Primeiro, verifica se o inscrito pertence ao congresso selecionado
-        if (inscrito.tipo_evento !== congressoSelecionado?.evento) {
-          return false;
-        }
-
-        // Depois aplica o filtro de pesquisa em nome e congregação
         const termoPesquisaLower = termoPesquisa.toLowerCase();
         return inscrito.nome_completo.toLowerCase().includes(termoPesquisaLower) ||
           inscrito.congregacao.toLowerCase().includes(termoPesquisaLower);
       })
       .sort((a, b) => a.nome_completo.localeCompare(b.nome_completo));
-  }, [inscritos, termoPesquisa, congressoSelecionado]);
-
+  }, [inscritos, termoPesquisa]);
 
   return (
     <div className="space-y-6 relative">
@@ -546,14 +549,13 @@ export default function InscricoesPage() {
                       {opcoesCores.map((cor, index) => (
                         <label
                           key={index}
-                          className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer"
-                        >
+                          className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer">
                           <input
                             type="radio"
                             name="cor_camisa"
                             value={cor.toUpperCase()}
                             className="mr-2 h-4 w-4 text-blue-600"
-                            required={index === 0}
+                            required={index === 0} // Aplica required apenas no primeiro
                             defaultChecked={corSelecionadaAuto === cor.toUpperCase()}
                           />
                           <span className="text-black">{cor}</span>
@@ -569,22 +571,19 @@ export default function InscricoesPage() {
                       {opcoesEstilo.map((estilo, index) => (
                         <label
                           key={index}
-                          className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer"
-                        >
+                          className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer"                        >
                           <input
                             type="radio"
                             name="estilo_camisa"
                             value={estilo.toUpperCase()}
                             className="mr-2 h-4 w-4 text-blue-600"
                             required={index === 0}
-                            defaultChecked={estiloSelecionadaAuto === estilo.toUpperCase()}
-                          />
+                            defaultChecked={estiloSelecionadaAuto === estilo.toUpperCase()} />
                           <span className="text-black">{estilo}</span>
                         </label>
                       ))}
                     </div>
                   </div>
-
 
                   <div className="space-y-1">
                     <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
@@ -978,7 +977,7 @@ export default function InscricoesPage() {
                       {opcoesCores.map((cor, index) => (
                         <label
                           key={index}
-                          className="inline-flex items-center p-3 border border-gray-200 rounded-lg bg-gray-100 cursor-not-allowed"
+                          className="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer"
                         >
                           <input
                             type="radio"
