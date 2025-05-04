@@ -60,13 +60,12 @@ export default function InscricoesPage() {
     "PARQUE SUL",
     "PIÇARREIRA",
     "RENASCENÇA I",
-    "SANTA ISABEL",
     "SÃO RAIMUNDO",
     "SUB DIRCEU II",
     "TANCREDO NEVES",
     "TIMON",
-    "VILA VERDE",
-    "OUTRA"
+    "VILA VERDE"
+
   ];
 
   // Lista fixa de tipos de evento
@@ -92,7 +91,7 @@ export default function InscricoesPage() {
   const tamanhosPorCongresso: Record<number, string[]> = {
     1: ["PP", "P", "M", "G", "GG", "EXG", "SOB MEDIDA"],
     2: ["PP", "P", "M", "G", "GG", "EXG", "SOB MEDIDA"],
-    3: ["2 ANOS", "4 ANOS", "6 ANOS", "8 ANOS", "10 ANOS", "12 ANOS", "14 ANOS", "PP", "P", "M", "G", "SOB MEDIDA"],
+    3: ["2 ANOS", "4 ANOS", "6 ANOS", "8 ANOS", "10 ANOS", "12 ANOS", "14 ANOS", "PP", "P", "M", "G"],
   };
 
   const [observacao, setObservacao] = useState("");
@@ -106,7 +105,7 @@ export default function InscricoesPage() {
       id: 1,
       titulo: "Congresso de Mulheres",
       descricao: "Momentos especiais de edificação, comunhão e renovação para toda a família.",
-      data: "5-7 de Julho, 2025",
+      data: "4-6 de Julho, 2025",
       imagem: "/congresso_familia.jpeg",
       evento: "Congresso de Mulheres"
     },
@@ -122,7 +121,7 @@ export default function InscricoesPage() {
       id: 3,
       titulo: "Congresso de Crianças",
       descricao: "Momentos especiais de edificação, comunhão e renovação para toda a família.",
-      data: "5-7 de Julho, 2025",
+      data: "4-6 de Julho, 2025",
       imagem: "/congresso_familia.jpeg",
       evento: "Congresso de Criança"
     }
@@ -131,8 +130,15 @@ export default function InscricoesPage() {
   const id = congressoSelecionado?.id as 1 | 2 | 3 | undefined;
   const opcoesCores = id ? coresPorCongresso[id] : [];
 
+
+  // Define cor selecionada automaticamente se for congresso 2 ou 3
+  const corSelecionadaAuto = id === 2 || id === 3 ? opcoesCores[0]?.toUpperCase() : undefined;
+
   const id2 = congressoSelecionado?.id as 1 | 2 | 3 | undefined;
   const opcoesEstilo = id ? estilosPorCongresso[id] : [];
+
+  // Define o estilo automaticamente se for congresso 2 ou 3
+  const estiloSelecionadaAuto = id === 2 || id === 3 ? opcoesEstilo[0]?.toUpperCase() : undefined;
 
   const tamanhosDisponiveis =
     congressoSelecionado?.id && tamanhosPorCongresso[congressoSelecionado.id]
@@ -222,7 +228,11 @@ export default function InscricoesPage() {
     try {
       setLoading(true);
       setError(null);
+<<<<<<< HEAD
+
+=======
       
+>>>>>>> 4d9cab003796800f6f04a33e070875089eb05b10
       const response = await participanteService.listarInscricoes();
       console.log('Resposta da API:', response);
 
@@ -231,7 +241,11 @@ export default function InscricoesPage() {
       }
 
       let inscricoes: Inscrito[] = [];
+<<<<<<< HEAD
+
+=======
       
+>>>>>>> 4d9cab003796800f6f04a33e070875089eb05b10
       if (response.inscricoes) {
         inscricoes = response.inscricoes;
       } else if (Array.isArray(response)) {
@@ -343,7 +357,7 @@ export default function InscricoesPage() {
       .filter(inscrito => {
         const termoPesquisaLower = termoPesquisa.toLowerCase();
         return inscrito.nome_completo.toLowerCase().includes(termoPesquisaLower) ||
-               inscrito.congregacao.toLowerCase().includes(termoPesquisaLower);
+          inscrito.congregacao.toLowerCase().includes(termoPesquisaLower);
       })
       .sort((a, b) => a.nome_completo.localeCompare(b.nome_completo));
   }, [inscritos, termoPesquisa]);
@@ -547,9 +561,10 @@ export default function InscricoesPage() {
                           <input
                             type="radio"
                             name="cor_camisa"
-                            value={cor.toLowerCase()}
+                            value={cor.toUpperCase()}
                             className="mr-2 h-4 w-4 text-blue-600"
                             required={index === 0} // Aplica required apenas no primeiro
+                            defaultChecked={corSelecionadaAuto === cor.toUpperCase()}
                           />
                           <span className="text-black">{cor}</span>
                         </label>
@@ -570,7 +585,8 @@ export default function InscricoesPage() {
                             name="estilo_camisa"
                             value={estilo.toUpperCase()}
                             className="mr-2 h-4 w-4 text-blue-600"
-                            required={index === 0} />
+                            required={index === 0}
+                            defaultChecked={estiloSelecionadaAuto === estilo.toUpperCase()} />
                           <span className="text-black">{estilo}</span>
                         </label>
                       ))}
@@ -603,7 +619,7 @@ export default function InscricoesPage() {
                     <select
                       name="forma_pagamento"
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
-                      defaultValue="especie"
+                      defaultValue="Selecione"
                     >
                       <option value="">Selecione</option>
                       <option value="especie">Espécie</option>
@@ -708,7 +724,7 @@ export default function InscricoesPage() {
                   title="Exportar para CSV"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
                   <span>Exportar CSV</span>
                 </button>
@@ -974,9 +990,10 @@ export default function InscricoesPage() {
                           <input
                             type="radio"
                             name="cor_camisa"
-                            value={cor.toLowerCase()}
-                            className="mr-2 h-4 w-4 text-blue-600"
-                            required={index === 0} // Aplica required apenas no primeiro
+                            value={cor.toUpperCase()}
+                            checked={inscritoParaEditar.cor_camisa.toUpperCase() === cor.toUpperCase()}
+                            disabled
+                            className="mr-2 h-4 w-4"
                           />
                           <span className="text-black">{cor}</span>
                         </label>
@@ -987,35 +1004,17 @@ export default function InscricoesPage() {
                     <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
                       Estilo da Camisa <span className="text-red-500">*</span>
                     </label>
-                    <select
-                      name="estilo_camisa"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 text-gray-700 appearance-none"
-                      defaultValue={inscritoParaEditar.estilo_camisa}
-                      disabled
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="normal">Normal</option>
-                      <option value="babylook">Babylook</option>
-                    </select>
+                    <div className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 text-gray-700">
+                      {inscritoParaEditar.estilo_camisa === 'NORMAL' ? 'NORMAL' : 'BABYLOOK'}
+                    </div>
                   </div>
                   <div className="space-y-1">
                     <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
                       Tamanho da camisa <span className="text-red-500">*</span>
                     </label>
-                    <select
-                      name="tamanho"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 text-gray-700 appearance-none"
-                      defaultValue={inscritoParaEditar.tamanho}
-                      disabled
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="PP">PP</option>
-                      <option value="P">P</option>
-                      <option value="M">M</option>
-                      <option value="G">G</option>
-                      <option value="GG">GG</option>
-                      <option value="EXG">EXG</option>
-                    </select>
+                    <div className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 text-gray-700">
+                      {inscritoParaEditar.tamanho}
+                    </div>
                   </div>
                   <div className="space-y-1">
                     <label className="block text-black font-medium mb-1 text-sm uppercase tracking-wide">
@@ -1026,6 +1025,7 @@ export default function InscricoesPage() {
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black transition-all duration-200 hover:border-blue-500 appearance-none bg-white"
                       defaultValue={inscritoParaEditar.forma_pagamento || "especie"}
                     >
+                      <option value="">Selecione</option>
                       <option value="especie">Espécie</option>
                       <option value="pix">PIX</option>
                       <option value="cartao">Cartão</option>
