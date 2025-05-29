@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { InputMaskWrapper } from '@/components/InputMaskWrapper';
-import participanteService from '../../../../../service/participanteService';
-import congregacaoService from '../../../../../service/congregacaoService';
+import participanteService from '@/services/participanteService';
+import congregacaoService from '@/services/congregacaoService';
 
 interface Congresso {
   id: number;
@@ -144,8 +144,11 @@ export default function InscricoesPage() {
     congressoSelecionado?.id && tamanhosPorCongresso[congressoSelecionado.id]
       ? tamanhosPorCongresso[congressoSelecionado.id]
       : [];
-
   const abrirModal = (congressoId: number) => {
+    // Bloqueia abertura do modal para o congresso de mulheres (id: 1)
+    if (congressoId === 1) {
+      return;
+    }
     const congresso = congressos.find(c => c.id === congressoId);
     setCongressoSelecionado(congresso || null);
     setModalAberto(true);
@@ -223,29 +226,19 @@ export default function InscricoesPage() {
       }
     }
   };
-
   const carregarInscricoes = async () => {
     try {
       setLoading(true);
       setError(null);
-<<<<<<< HEAD
-
-=======
       
->>>>>>> 4d9cab003796800f6f04a33e070875089eb05b10
       const response = await participanteService.listarInscricoes();
       console.log('Resposta da API:', response);
 
       if (!response) {
-        throw new Error('Não foi possível obter os dados dos inscritos');
-      }
+        throw new Error('Não foi possível obter os dados dos inscritos');      }
 
       let inscricoes: Inscrito[] = [];
-<<<<<<< HEAD
-
-=======
       
->>>>>>> 4d9cab003796800f6f04a33e070875089eb05b10
       if (response.inscricoes) {
         inscricoes = response.inscricoes;
       } else if (Array.isArray(response)) {
@@ -381,17 +374,30 @@ export default function InscricoesPage() {
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-2 text-black">{congresso.titulo}</h2>
               <p className="text-gray-700 mb-3">{congresso.descricao}</p>
-              <p className="text-sm font-medium text-blue-600 mb-4">{congresso.data}</p>
-              <div className="flex flex-col space-y-2">
-                <button
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                  onClick={() => abrirModal(congresso.id)}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
-                  </svg>
-                  Fazer Inscrição
-                </button>
+              <p className="text-sm font-medium text-blue-600 mb-4">{congresso.data}</p>              <div className="flex flex-col space-y-2">
+                {congresso.id === 1 ? (
+                  // Congresso de Mulheres - Inscrições esgotadas
+                  <div className="w-full bg-red-100 border border-red-300 text-red-700 py-3 px-4 rounded-md text-center">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      <span className="font-semibold">Inscrições esgotadas</span>
+                    </div>
+                    <p className="text-sm">Para mais informações falar com Dayse (ADDIRCEU)</p>
+                  </div>
+                ) : (
+                  // Outros congressos - Botão normal de inscrição
+                  <button
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                    onClick={() => abrirModal(congresso.id)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                    </svg>
+                    Fazer Inscrição
+                  </button>
+                )}
                 <button
                   className="w-full border border-yellow-500 text-yellow-600 py-2 px-4 rounded-md hover:bg-yellow-50 transition-colors flex items-center justify-center gap-2"
                   onClick={() => abrirModalListagem(congresso.id)}

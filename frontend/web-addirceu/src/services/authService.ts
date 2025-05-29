@@ -28,21 +28,24 @@ const authService = {
       };
     }
   },
-
   logout: async () => {
     try {
       await api.post('/auth/logout/');
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     } finally {
-      localStorage.clear();
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+      }
     }
   },
-
   getCurrentUser: () => {
     try {
-      const user = localStorage.getItem('user');
-      return user ? JSON.parse(user) : null;
+      if (typeof window !== 'undefined') {
+        const user = localStorage.getItem('user');
+        return user ? JSON.parse(user) : null;
+      }
+      return null;
     } catch (error) {
       console.error('Erro ao recuperar usuário:', error);
       return null;
@@ -50,7 +53,10 @@ const authService = {
   },
 
   isAuthenticated: () => {
-    return !!localStorage.getItem('user');
+    if (typeof window !== 'undefined') {
+      return !!localStorage.getItem('user');
+    }
+    return false;
   }
 };
 

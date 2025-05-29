@@ -1,5 +1,4 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import authService from './authService';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -69,10 +68,13 @@ api.interceptors.response.use(
       switch (status) {
         case 400:
           console.error('Requisição inválida:', error.response.data);
-          break;
-        case 401:
+          break;        case 401:
           console.error('Não autorizado');
-          authService.logout();
+          // Evita importação circular - logout será tratado pelos componentes
+          if (typeof window !== 'undefined') {
+            localStorage.clear();
+            window.location.href = '/login';
+          }
           break;
         case 403:
           console.error('Acesso proibido');
