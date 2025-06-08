@@ -143,10 +143,9 @@ export default function InscricoesPage() {
   const tamanhosDisponiveis =
     congressoSelecionado?.id && tamanhosPorCongresso[congressoSelecionado.id]
       ? tamanhosPorCongresso[congressoSelecionado.id]
-      : [];
-  const abrirModal = (congressoId: number) => {
-    // Bloqueia abertura do modal para o congresso de mulheres (id: 1)
-    if (congressoId === 1) {
+      : [];  const abrirModal = (congressoId: number) => {
+    // Bloqueia abertura do modal para o congresso de mulheres (id: 1) e crianças (id: 3)
+    if (congressoId === 1 || congressoId === 3) {
       return;
     }
     const congresso = congressos.find(c => c.id === congressoId);
@@ -375,8 +374,8 @@ export default function InscricoesPage() {
               <h2 className="text-xl font-semibold mb-2 text-black">{congresso.titulo}</h2>
               <p className="text-gray-700 mb-3">{congresso.descricao}</p>
               <p className="text-sm font-medium text-blue-600 mb-4">{congresso.data}</p>              <div className="flex flex-col space-y-2">
-                {congresso.id === 1 ? (
-                  // Congresso de Mulheres - Inscrições esgotadas
+                {congresso.id === 1 || congresso.id === 3 ? (
+                  // Congresso de Mulheres e Crianças - Inscrições esgotadas
                   <div className="w-full bg-red-100 border border-red-300 text-red-700 py-3 px-4 rounded-md text-center">
                     <div className="flex items-center justify-center gap-2 mb-1">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
